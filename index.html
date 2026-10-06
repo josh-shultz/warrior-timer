@@ -1,0 +1,1111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Warrior Timer">
+<meta name="theme-color" content="#0a0a0c">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ff7a1a'/%3E%3Ctext x='50' y='66' font-size='48' text-anchor='middle' font-family='Arial' font-weight='bold' fill='%23000'%3EW%3C/text%3E%3C/svg%3E">
+<title>Warrior Workout Timer</title>
+<style>
+  :root{
+    --bg:#0a0a0c; --panel:#16161a; --panel2:#1f1f25; --line:#2c2c34;
+    --text:#f6f6f6; --muted:#a5a5b0; --work:#ff7a1a; --rest:#22c55e; --ready:#38bdf8; --accent:var(--work);
+    --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%}
+  body{min-height:100vh;min-height:100dvh}
+  button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+  .hidden{display:none!important}
+  .screen{max-width:760px;margin:0 auto;padding:calc(14px + var(--safe-t)) 16px calc(16px + var(--safe-b))}
+
+  /* ---------- setup ---------- */
+  h1{font-size:26px;margin:4px 0 2px;letter-spacing:.3px}
+  h1 span{color:var(--work)}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 14px}
+  .label{font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:16px 0 8px}
+  select{width:100%;font-size:17px;padding:12px;border-radius:12px;background:var(--panel);color:var(--text);border:1px solid var(--line)}
+  .days{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+  .day{background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:10px 12px;text-align:left;min-height:74px}
+  .day b{display:block;font-size:18px}
+  .day small{display:block;color:var(--muted);font-size:13px;line-height:1.25;margin-top:2px}
+  .day .dt{color:var(--text);font-variant-numeric:tabular-nums;font-weight:600;margin-top:4px}
+  .day.sel{border-color:var(--work);background:#2a1a0e}
+  .seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+  .seg button{flex:1;border:0;background:transparent;padding:11px 4px;border-radius:9px;font-size:15px;font-weight:600;color:var(--muted)}
+  .seg button.sel{background:var(--work);color:#000}
+  .effort{background:var(--panel);border-left:4px solid var(--work);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:15px;line-height:1.35}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:8px}
+  .row .t{font-size:16px;font-weight:600}
+  .row .d{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.3}
+  .switch{position:relative;width:56px;height:32px;flex:none;border-radius:20px;border:0;background:#3a3a44;transition:background .15s}
+  .switch::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:left .15s}
+  .switch[aria-checked="true"]{background:var(--work)}
+  .switch[aria-checked="true"]::after{left:27px}
+  .total{display:flex;align-items:baseline;justify-content:space-between;margin:18px 0 6px;padding:14px;background:var(--panel2);border-radius:14px}
+  .total .big{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums}
+  .total .meta{color:var(--muted);font-size:14px;text-align:right}
+  .intro{color:var(--muted);font-size:13px;line-height:1.4;margin:6px 2px 0}
+  .intro div{margin:2px 0}
+  .steps{list-style:none;margin:8px 0 0;padding:0}
+  .grp{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:12px 4px 4px}
+  .grp.vet{color:#ffb36b}
+  .st{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border-bottom:1px solid var(--line)}
+  .dot{width:10px;height:10px;border-radius:50%;margin-top:6px;flex:none;background:var(--work)}
+  .st.rest .dot{background:var(--rest)}
+  .st .n{flex:1;font-size:16px;line-height:1.3}
+  .st .n small{display:block;color:var(--muted);font-size:12.5px;line-height:1.3;margin-top:1px}
+  .st .s{font-variant-numeric:tabular-nums;font-weight:600;color:var(--muted);white-space:nowrap}
+  .st.has-how{cursor:pointer}
+  .st .chev{display:inline-block;font-size:12px;color:var(--ready);font-weight:700;margin-left:6px;white-space:nowrap}
+  .st .gr{display:block;font-size:11.5px;color:var(--ready);font-weight:700;margin-top:3px;text-align:right}
+  .st .howbox{display:none;margin-top:8px}
+  .st.open .howbox{display:block}
+  .howbox,.howpanel{font-size:14.5px;line-height:1.4}
+  .howbox ul,.howpanel ul{margin:4px 0 0;padding-left:20px}
+  .howbox li,.howpanel li{margin:3px 0}
+  .howt{font-size:12px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;color:var(--ready)}
+  .easy{margin-top:6px;color:#d6d6de}
+  .easy b{color:#ffd166}
+  .demos{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
+  a.demo{display:inline-block;text-decoration:none;color:#fff;background:#c4302b;border-radius:10px;padding:8px 12px;font-size:14px;font-weight:700}
+  a.demo.mini{padding:3px 9px;font-size:12px;margin-left:8px;letter-spacing:0;text-transform:none;vertical-align:1px;border-radius:8px}
+  a.demo.alt{background:var(--panel2);border:1px solid var(--line);color:var(--text);font-weight:600}
+  .howpanel{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:16px;padding:10px 14px 12px;margin-top:8px;max-height:36vh;overflow:auto;-webkit-overflow-scrolling:touch}
+  .howpanel ul{font-size:16px;line-height:1.35}
+  .animbox{float:right;width:44%;max-width:240px;margin:2px 0 6px 12px}
+  .howbox .animbox{float:none;width:100%;max-width:300px;margin:6px 0 8px}
+  .anim{position:relative;border-radius:10px;overflow:hidden;background:#fff}
+  .anim img{display:block;width:100%;height:auto}
+  .anim img.f2{position:absolute;left:0;top:0;animation:flip 1.4s linear infinite}
+  @keyframes flip{0%,49.9%{opacity:0}50%,100%{opacity:1}}
+  a.cred{display:block;font-size:10px;color:var(--muted);margin-top:3px;text-decoration:none;line-height:1.2}
+  .demos{clear:both}
+  .tips{color:var(--muted);font-size:12.5px;line-height:1.45;margin:16px 2px 110px}
+  .startbar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + var(--safe-b));background:linear-gradient(transparent,var(--bg) 30%)}
+  .startbar button{display:block;width:100%;max-width:728px;margin:0 auto;border:0;border-radius:18px;padding:20px;font-size:24px;font-weight:800;background:var(--work);color:#000;letter-spacing:.5px;box-shadow:0 6px 24px rgba(255,122,26,.35)}
+
+  /* ---------- timer ---------- */
+  #timer{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;padding:calc(10px + var(--safe-t)) 14px calc(14px + var(--safe-b));max-width:900px;margin:0 auto}
+  body.rest{--accent:var(--rest)}
+  body.ready{--accent:var(--ready)}
+  .topline{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .iconbtn{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:9px 12px;font-size:15px;font-weight:600;min-width:44px}
+  .ovbar{height:6px;background:var(--panel2);border-radius:4px;overflow:hidden;margin:8px 0 10px}
+  .ovbar i{display:block;height:100%;width:0;background:#777}
+  .stage{background:var(--accent);color:#000;border-radius:22px;padding:14px 16px 16px}
+  .stage .meta{display:flex;justify-content:space-between;gap:8px;font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:1px}
+  .stage .ex{font-size:clamp(28px,8.5vw,58px);font-weight:900;line-height:1.05;margin-top:8px;word-break:break-word}
+  .stage .note{font-size:15px;font-weight:600;margin-top:6px;line-height:1.3;opacity:.85}
+  .stage .eff{font-size:16px;font-weight:800;margin-top:6px;background:rgba(0,0,0,.14);border-radius:8px;padding:5px 8px;display:inline-block}
+  .clock{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0;position:relative;padding:4px 0}
+  #count{font-size:min(34vw,16vh);font-weight:800;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:-2px}
+  #count.long{font-size:min(26vw,14vh)}
+  #clockLbl{font-size:16px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;min-height:20px}
+  .paused #count{animation:blink 1.2s steps(2,start) infinite;opacity:.9}
+  @keyframes blink{to{visibility:hidden}}
+  .sbar{width:100%;height:12px;background:var(--panel2);border-radius:8px;overflow:hidden;margin-top:10px}
+  .sbar i{display:block;height:100%;width:0;background:var(--accent)}
+  .nextup{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:18px;line-height:1.25;margin:8px 0}
+  .nextup b{color:var(--muted);font-weight:700;font-size:14px;letter-spacing:1px;text-transform:uppercase;margin-right:6px}
+  .nextup .ns{float:right;color:var(--muted);font-variant-numeric:tabular-nums}
+  .ctrls{display:grid;grid-template-columns:1fr 1.5fr 1fr;gap:10px}
+  .ctrls button{border:0;border-radius:20px;padding:18px 6px;font-size:22px;font-weight:800;background:var(--panel2);color:var(--text);min-height:76px}
+  .ctrls #btnPlay{background:var(--accent);color:#000;font-size:28px}
+  .ctrls button:active{transform:scale(.97)}
+  .wake{font-size:12px;color:var(--muted);text-align:center;margin-top:6px;min-height:15px}
+  @media (max-height:740px) and (orientation:portrait){
+    .stage{padding:10px 14px 12px;border-radius:18px}
+    .stage .ex{font-size:clamp(24px,7.5vw,48px);margin-top:4px}
+    .howpanel{max-height:27vh}
+    .howpanel ul{font-size:15px}
+    .animbox{width:40%}
+    #count{font-size:min(30vw,14vh)}
+    .ctrls button{min-height:64px;padding:12px 6px;font-size:20px}
+    .ctrls #btnPlay{font-size:24px}
+    .nextup{font-size:16px;padding:8px 12px;margin:6px 0}
+    .wake{margin-top:4px}
+  }
+  @media (orientation:landscape) and (max-height:520px){
+    #timer{display:grid;grid-template-columns:1.1fr 1fr;grid-template-rows:auto auto 1fr auto auto;column-gap:16px}
+    .topline,.ovbar{grid-column:1/3}
+    .stage{grid-column:1;grid-row:3}
+    .howpanel{grid-column:1;grid-row:4;max-height:40vh}
+    .clock{grid-column:2;grid-row:3;min-height:0}
+    #count{font-size:min(22vw,42vh)}
+    .nextup{grid-column:2;grid-row:4;margin:8px 0 0}
+    .ctrls{grid-column:2;grid-row:5;margin-top:8px}
+    .ctrls button{min-height:60px;padding:12px 6px}
+    .wake{grid-column:1;grid-row:5}
+  }
+
+  /* ---------- done ---------- */
+  #done{text-align:center;padding-top:calc(50px + var(--safe-t))}
+  #done .chk{width:110px;height:110px;border-radius:50%;background:var(--rest);color:#000;font-size:66px;line-height:110px;margin:0 auto 18px;font-weight:900}
+  #done h2{font-size:36px;margin:0 0 4px}
+  #done .dname{color:var(--muted);font-size:17px}
+  #done .ttl{font-size:64px;font-weight:900;font-variant-numeric:tabular-nums;margin:22px 0 2px;color:var(--work)}
+  #done .tsub{color:var(--muted);font-size:14px}
+  #done .res{background:var(--panel);border-radius:14px;padding:12px 16px;margin:18px auto 0;max-width:420px;text-align:left;font-size:16px;line-height:1.6}
+  #done .pts{margin-top:18px;font-size:16px;color:#ffb36b;font-weight:700}
+  #done button{margin-top:28px;border:0;border-radius:18px;padding:18px 26px;font-size:20px;font-weight:800;background:var(--work);color:#000;width:100%;max-width:420px}
+</style>
+</head>
+<body>
+
+<!-- ================= SETUP ================= -->
+<section id="setup" class="screen">
+  <h1>Warrior <span>Workout</span> Timer</h1>
+  <p class="sub">Warrior MBS interval timer &middot; pick a day, review, start.</p>
+
+  <div id="weekWrap" class="hidden">
+    <div class="label">Week</div>
+    <select id="weekSel"></select>
+  </div>
+
+  <div class="label" id="weekLabel">Workout day</div>
+  <div class="days" id="days"></div>
+
+  <div id="levelWrap" class="hidden">
+    <div class="label">Run level</div>
+    <div class="seg" id="levelSeg"></div>
+    <div class="effort" id="effortTxt"></div>
+  </div>
+
+  <div class="row" id="vetRow">
+    <div><div class="t">Veteran Challenge</div><div class="d" id="vetDesc"></div></div>
+    <button class="switch" id="vetSw" role="switch" aria-checked="false" aria-label="Veteran Challenge"></button>
+  </div>
+  <div class="row">
+    <div><div class="t">Voice &amp; beeps</div><div class="d">Spoken cues, &ldquo;Next&rdquo; preview and 3-2-1 countdown</div></div>
+    <button class="switch" id="soundSw" role="switch" aria-checked="true" aria-label="Voice and beeps"></button>
+  </div>
+
+  <div class="total">
+    <div><div class="label" style="margin:0 0 2px">Total time</div><div class="big" id="totalTxt">0:00</div></div>
+    <div class="meta" id="totalMeta"></div>
+  </div>
+  <div class="intro" id="intro"></div>
+
+  <ul class="steps" id="stepList"></ul>
+
+  <div class="tips">
+    iPhone tips: turn off Silent mode (ring/silent switch) and raise the volume to hear the cues.
+    The screen is kept awake while the timer runs when your browser supports it; otherwise set
+    Settings &rsaquo; Display &amp; Brightness &rsaquo; Auto-Lock to Never during workouts.
+    Share &rsaquo; Add to Home Screen gives a full-screen app. Timing is clock-based, so a short trip to another app won&rsquo;t throw it off.
+  </div>
+  <div class="startbar"><button id="btnStart">START</button></div>
+</section>
+
+<!-- ================= TIMER ================= -->
+<section id="timer" class="hidden">
+  <div class="topline">
+    <button class="iconbtn" id="btnEnd" aria-label="End workout">&#x2715; End</button>
+    <span id="ovTxt"></span>
+    <button class="iconbtn" id="btnMute" aria-label="Mute">&#x1F50A;</button>
+  </div>
+  <div class="ovbar"><i id="ovBar"></i></div>
+
+  <div class="stage">
+    <div class="meta"><span id="phase">Work</span><span id="round"></span></div>
+    <div class="ex" id="exName"></div>
+    <div class="eff hidden" id="exEff"></div>
+    <div class="note" id="exNote"></div>
+  </div>
+
+  <div class="howpanel hidden" id="how"></div>
+
+  <div class="clock">
+    <div id="clockLbl"></div>
+    <div id="count">0:00</div>
+    <div class="sbar"><i id="sBar"></i></div>
+  </div>
+
+  <div class="nextup" id="nextup"></div>
+
+  <div class="ctrls">
+    <button id="btnBack" aria-label="Back">&#x23EE; Back</button>
+    <button id="btnPlay">Pause</button>
+    <button id="btnSkip" aria-label="Skip">Skip &#x23ED;</button>
+  </div>
+  <div class="wake" id="wakeTxt"></div>
+</section>
+
+<!-- ================= DONE ================= -->
+<section id="done" class="screen hidden">
+  <div class="chk">&#x2713;</div>
+  <h2>Workout complete</h2>
+  <div class="dname" id="doneName"></div>
+  <div class="ttl" id="doneTime">0:00</div>
+  <div class="tsub" id="doneSub"></div>
+  <div class="res hidden" id="doneRes"></div>
+  <div class="pts">Each workout is worth 2 points &mdash; log it!</div>
+  <button id="btnAgain">Back to workouts</button>
+</section>
+
+<script>
+'use strict';
+/* =====================================================================
+   WORKOUT DATA  (source: "WARRIOR WORKOUTS | WEEK 1" document)
+   To add a week: push another { week, title, days:[...] } onto WEEKS.
+   Block types inside a day's `blocks` array:
+     - a step:   { name, sec, kind:'work'|'rest', note, say, how, effort, cueAt, cue, record }
+                 sec:null = open-ended step (counts up, tap Skip/Done to finish)
+                 how = key into HOWTO (defaults to the step name)
+                 effort:true = show the selected run level's effort description
+                 cueAt/cue  = extra spoken cue when that many seconds remain
+                 record:true = log the time held (shown on the complete screen)
+     - a repeat: { repeat:N, section, roundWord, steps:[...], between:step, continuous }
+                 `between` is inserted between rounds (not after the last).
+                 continuous:true = only one 5-sec get-ready before the whole block
+                 (used for the Day 2 run/walk intervals).
+     - add veteran:true to a block to make it part of the optional Veteran Challenge.
+   A 5-second "Get ready" step is inserted automatically before every work step
+   (see GET_READY_SEC / expandDay).
+   ===================================================================== */
+const APP_VERSION = '2026-10-06.2';
+const GET_READY_SEC = 5;
+const WORK = 'work', REST = 'rest', READY = 'ready';
+const W = (name, sec, note, extra) => Object.assign({ name, sec, kind: WORK, note: note || '' }, extra || {});
+const R = (sec, name, note, extra) => Object.assign({ name: name || 'Rest', sec, kind: REST, note: note || '' }, extra || {});
+const WARMUP = { name: '5-minute warm-up', sec: 300, kind: WORK, section: 'Warm-Up', say: 'warm up', how: 'Warm-up',
+  note: 'Mandatory every day. See the warm-up document and videos for details and demonstration.' };
+const COOLDOWN = (sec, note, name, how) => ({ name: name || 'Cooldown', sec, kind: REST, section: 'Cooldown', note: note || '', how: how || 'Cooldown' });
+
+/* ---------- How-to cues for every exercise ----------
+   cues: 2-4 short form cues; easier: easier option; demos: [button label, YouTube search term]
+   (search links, not specific videos). */
+const HOWTO = {
+  'Warm-up': {
+    cues: ['Use the program\u2019s warm-up video if you have it; otherwise keep moving the whole 5 minutes.',
+      'Start easy: march or jog in place, then arm circles forward and back.',
+      'Add leg swings (hold a wall), hip circles and slow bodyweight squats.',
+      'Finish with light jumping jacks so you\u2019re warm, not tired.'],
+    easier: 'Keep everything low-impact: march instead of jog, step-jacks instead of jumping jacks.',
+    demos: [['Watch demo', '5 minute warm up before workout']] },
+  'Push Ups': {
+    cues: ['Hands just wider than shoulders; body in one straight line from head to heels.',
+      'Squeeze glutes and brace abs so hips don\u2019t sag or stick up.',
+      'Lower until your chest is about a fist from the floor, elbows angled ~45\u00b0 back (not flared out).',
+      'Press the floor away to the top; keep your neck neutral.'],
+    easier: 'Knee push-ups, or hands on a bench/counter (incline push-ups).',
+    demos: [['Watch demo', 'push ups'], ['Knee / incline push-ups', 'knee push ups and incline push ups']] },
+  'Forearm Plank': {
+    cues: ['Elbows directly under shoulders, forearms flat, up on your toes.',
+      'Straight line from head to heels \u2014 no sagging or piking hips.',
+      'Squeeze glutes, pull belly button in, keep breathing.'],
+    easier: 'Drop to your knees, still keeping a straight line from knees to head.',
+    demos: [['Watch demo', 'forearm plank']] },
+  'Flutter Kicks': {
+    cues: ['Lie on your back, hands under your hips/glutes, legs straight.',
+      'Press your lower back into the floor and lift heels a few inches.',
+      'Kick legs in small, quick, alternating up-and-down motions.',
+      'If your lower back arches off the floor, raise your legs higher.'],
+    easier: 'Keep legs higher (closer to vertical) or bend your knees slightly.',
+    demos: [['Watch demo', 'flutter kicks']] },
+  'Glute Bridges': {
+    cues: ['Lie on your back, knees bent, feet flat and hip-width apart, close to your butt.',
+      'Push through your heels and squeeze your glutes to lift your hips.',
+      'Stop when knees, hips and shoulders form a straight line \u2014 don\u2019t arch your back.',
+      'Pause a second at the top, then lower slowly.'],
+    easier: 'Lift only part way up and take a short pause at the bottom.',
+    demos: [['Watch demo', 'glute bridge']] },
+  'High Knee Walking Lunge': {
+    cues: ['Stand tall and drive one knee up to about hip height.',
+      'Step that foot forward into a lunge: both knees about 90\u00b0, back knee just above the floor.',
+      'Front knee stays over the ankle (not caving in); chest up.',
+      'Push through the front heel to stand, drive the other knee up and repeat.'],
+    easier: 'Skip the knee drive, take shorter steps and a shallower lunge; touch a wall for balance.',
+    demos: [['Watch demo', 'high knee walking lunge'], ['Basic walking lunge', 'walking lunge']] },
+  'Wall Sit': {
+    cues: ['Back flat against a wall; walk feet out about 2 feet.',
+      'Slide down until knees are at 90\u00b0 (thighs parallel to the floor).',
+      'Knees stacked over ankles, weight in your heels.',
+      'Hands off your thighs; breathe steadily and hold.'],
+    easier: 'Slide only part way down (knees less bent) and work lower over time.',
+    demos: [['Watch demo', 'wall sit']] },
+  'Plank-Ups': {
+    cues: ['Start in a forearm plank.',
+      'Press up onto one hand, then the other, into a high (push-up) plank.',
+      'Lower back down one forearm at a time; switch the leading arm each rep.',
+      'Keep hips level \u2014 feet a little wider helps stop rocking.'],
+    easier: 'Do them from your knees.',
+    demos: [['Watch demo', 'plank up downs']] },
+  'Chin Ups or Pull-Ups': {
+    cues: ['Palms facing you = chin-up (easier); palms away = pull-up. Hands about shoulder width.',
+      'Start from a full hang; pull shoulders down and back first.',
+      'Pull until your chin clears the bar, then lower under control. No swinging.'],
+    easier: 'Doc mod \u2014 isometric hold: jump or step up so your elbows are at 90\u00b0 (mid point) and hold as long as you can. A resistance band also helps.',
+    demos: [['Watch demo', 'chin ups'], ['Isometric hold (mod)', 'pull up isometric hold']] },
+  'Pull-Up Isometric Hold': {
+    cues: ['Jump or step up to the mid point of a pull-up (elbows about 90\u00b0).',
+      'Shoulders pulled down away from your ears, core tight, legs still.',
+      'Hold as long as you can, lower slowly, then tap Done to log your time.'],
+    easier: 'Hold higher up (chin near the bar), or keep a toe on a box for a little help.',
+    demos: [['Watch demo', 'pull up isometric hold']] },
+  'Leg Raises': {
+    cues: ['Lie flat, hands under your hips, legs straight and together.',
+      'Press your lower back into the floor and raise legs to vertical.',
+      'Lower slowly to just above the floor without letting your back arch.'],
+    easier: 'Doc mod: knee raises (bend knees and pull them toward your chest) or sit-ups.',
+    demos: [['Watch demo', 'lying leg raises'], ['Knee raises (mod)', 'lying knee raises'], ['Sit-ups (mod)', 'sit ups']] },
+  'Sit-ups': {
+    cues: ['Lie on your back, knees bent, feet flat (tuck them under a couch if needed).',
+      'Arms crossed on your chest or fingertips lightly at your temples \u2014 don\u2019t pull your neck.',
+      'Curl up until your chest nears your knees, then lower slowly.'],
+    easier: 'Crunches: lift just your head and shoulders off the floor.',
+    demos: [['Watch demo', 'sit ups'], ['Crunches', 'crunches']] },
+  'Straight Bar Rows': {
+    cues: ['At home, a sturdy table edge or a low bar works: lie underneath and grab the edge/bar about shoulder width. Test that it holds your weight first.',
+      'Body straight from heels to head, arms straight.',
+      'Pull your chest up to the edge/bar, squeezing shoulder blades together, then lower slowly.'],
+    easier: 'Bend your knees with feet flat (easier), or use a higher bar. No equipment? Doc mod: Explosive Jumping Jacks.',
+    demos: [['Watch demo', 'inverted row'], ['Table row at home', 'inverted row under table at home'], ['Jumping jacks (mod)', 'explosive jumping jacks']] },
+  'Bench Dips': {
+    cues: ['Hands on the edge of a sturdy bench or chair behind you, fingers forward, butt just off the edge.',
+      'Bend elbows straight back to about 90\u00b0, keeping your back close to the bench.',
+      'Shoulders down away from your ears; press back up.'],
+    easier: 'Bend your knees and bring feet closer. Doc mod: isometric hold at the mid point (elbows at 90\u00b0).',
+    demos: [['Watch demo', 'bench dips'], ['Isometric hold (mod)', 'bench dip isometric hold']] },
+  'Step Ups': {
+    cues: ['Use a sturdy step, bench or stair (knee height or lower).',
+      'Put your whole foot on the step and push through that heel to stand tall.',
+      'Don\u2019t push off the bottom foot; step down with control.',
+      '30 seconds on one leg, then switch \u2014 the voice will say \u201cswitch legs\u201d.'],
+    easier: 'Use a lower step and hold a rail or wall.',
+    demos: [['Watch demo', 'step ups']] },
+  'Supermans': {
+    cues: ['Lie face down, arms straight overhead, legs straight.',
+      'Lift arms, chest and legs a few inches off the floor at the same time.',
+      'Squeeze glutes and back, hold 1\u20132 seconds, lower; look at the floor to keep your neck neutral.'],
+    easier: 'Lift opposite arm and leg only, alternating sides.',
+    demos: [['Watch demo', 'superman exercise']] },
+  'Mountain Climbers': {
+    cues: ['Start in a high plank: hands under shoulders, body straight.',
+      'Drive one knee toward your chest, then quickly switch legs like running.',
+      'Keep hips low and shoulders over your hands.'],
+    easier: 'Slow it down and step each foot in instead of jumping.',
+    demos: [['Watch demo', 'mountain climbers']] },
+  'Explosive Jumping Jacks': {
+    cues: ['Jump feet wide while swinging arms overhead, then jump back together.',
+      'Land softly on the balls of your feet with knees slightly bent.',
+      'Go fast and powerful for the whole interval.'],
+    easier: 'Step-jacks: step one foot out at a time, no jumping.',
+    demos: [['Watch demo', 'jumping jacks']] },
+  'Run': {
+    cues: ['Run at your level\u2019s effort (shown above) for the 10 seconds, then go straight into the walk.',
+      'Tall posture, slight forward lean, relaxed shoulders; arms swing front to back.',
+      'Short, quick steps landing under your hips.',
+      'During the walk, slow your breathing: in through the nose, out through the mouth.'],
+    easier: 'Pick Beginner effort; a brisk walk or easy jog is fine.',
+    demos: [['Watch demo', 'interval running']] },
+  'Jog': {
+    cues: ['Keep it easy at the doc\u2019s effort (30\u201350%) \u2014 you should be able to talk.',
+      'Tall posture, relaxed shoulders, short quick steps landing under your hips.',
+      'Breathe from the diaphragm: slow and deep, in through the nose, out through the mouth.'],
+    easier: 'Walk-jog: alternate jogging and walking if you need to, but keep moving.',
+    demos: [['Watch demo', 'jogging for beginners']] },
+  'Stretch': {
+    cues: ['Hamstrings: heel on a low step (or sit, legs out), hinge forward at the hips with a flat back; ~30 s each leg.',
+      'Quad pulls: stand tall, pull one heel to your butt, knees together, hips forward; ~30 s each leg (hold a wall).',
+      'Overhead reach: hands above your head, reach tall and lengthen your body.',
+      'Slow, deep belly (diaphragm) breaths; no bouncing.'],
+    easier: 'Go only to a gentle stretch, never pain.',
+    demos: [['Hamstring stretch', 'standing hamstring stretch'], ['Quad stretch', 'standing quad stretch'], ['Overhead reach', 'standing overhead reach stretch']] },
+  'Cooldown': {
+    cues: ['Walk slowly for a minute or two to bring your heart rate down.',
+      'Stretch what you worked (legs, hips, chest, shoulders); hold each stretch 20\u201330 seconds, no bouncing.',
+      'Slow, deep breaths \u2014 and drink lots of water.'],
+    easier: '',
+    demos: [['Watch demo', 'cool down stretch']] },
+  'Cooldown walk': {
+    cues: ['Easy walking pace \u2014 keep moving, don\u2019t stop suddenly.',
+      'Let your breathing slow: in through the nose, out through the mouth, from the diaphragm.'],
+    easier: '',
+    demos: [] }
+};
+/* ---------- Looping exercise animations (local files in img/, see img/CREDITS.txt) ----------
+   Only added where the source clearly shows the right exercise. */
+const FEDB = { credit: 'Images: free-exercise-db (public domain)', href: 'https://github.com/yuhonas/free-exercise-db' };
+const ANIM = {
+  'Push Ups':             Object.assign({ frames: ['img/pushups-0.jpg', 'img/pushups-1.jpg'] }, FEDB),
+  'Forearm Plank':        Object.assign({ frames: ['img/plank-0.jpg'] }, FEDB),
+  'Glute Bridges':        Object.assign({ frames: ['img/glute-bridge-0.jpg', 'img/glute-bridge-1.jpg'] }, FEDB),
+  'Chin Ups or Pull-Ups': Object.assign({ frames: ['img/chin-up-0.jpg', 'img/chin-up-1.jpg'] }, FEDB),
+  'Sit-ups':              Object.assign({ frames: ['img/sit-up-0.jpg', 'img/sit-up-1.jpg'] }, FEDB),
+  'Straight Bar Rows':    Object.assign({ frames: ['img/inverted-row-0.jpg', 'img/inverted-row-1.jpg'] }, FEDB),
+  'Bench Dips':           Object.assign({ frames: ['img/bench-dips-0.jpg', 'img/bench-dips-1.jpg'] }, FEDB),
+  'Supermans':            Object.assign({ frames: ['img/superman-0.jpg', 'img/superman-1.jpg'] }, FEDB),
+  'Mountain Climbers':    Object.assign({ frames: ['img/mountain-climbers-0.jpg', 'img/mountain-climbers-1.jpg'] }, FEDB),
+  'Run':                  Object.assign({ frames: ['img/running-0.jpg', 'img/running-1.jpg'] }, FEDB),
+  'Jog':                  Object.assign({ frames: ['img/running-0.jpg', 'img/running-1.jpg'] }, FEDB),
+  'Leg Raises': { frames: ['img/leg-raises.gif'], credit: 'Animation: Wensceslao, CC BY-SA 4.0, via Wikimedia Commons',
+                  href: 'https://commons.wikimedia.org/wiki/File:Legraises.gif' }
+};
+Object.keys(ANIM).forEach(k => { if (HOWTO[k]) HOWTO[k].anim = ANIM[k]; });
+const howFor = s => (s && HOWTO[s.how || s.name]) || null;
+const demoUrl = term => 'https://www.youtube.com/results?search_query=' +
+  term.trim().split(/\s+/).map(encodeURIComponent).join('+') + '+proper+form+beginner';
+
+const WEEKS = [
+  {
+    week: 1,
+    title: 'Week 1',
+    days: [
+      {
+        id: 'w1d1', label: 'Day 1', name: 'Warrior Muscle Day', type: 'muscle',
+        intro: ['Interval timer app recommended - see video.', 'See videos for modifications for each workout.', 'Questions about form? Always review videos!'],
+        vetDesc: '3 sets: 60 sec Wall Sits (90° knee angle), 45 sec rest between sets',
+        blocks: [
+          WARMUP,
+          { repeat: 3, section: 'Interval Sets', roundWord: 'Round',
+            between: R(120, 'Rest between sets', 'Rest 2 minutes after each set, then repeat.'),
+            steps: [
+              W('Push Ups', 20, 'Focus: form and rhythm'), R(45),
+              W('Forearm Plank', 30), R(45),
+              W('Flutter Kicks', 30), R(45),
+              W('Glute Bridges', 30), R(45),
+              W('High Knee Walking Lunge', 30)
+            ] },
+          { veteran: true, repeat: 3, section: 'Veteran Challenge', roundWord: 'Set',
+            between: R(45),
+            steps: [ W('Wall Sits', 60, '90 degree angle at the knee', { say: 'wall sit', how: 'Wall Sit' }) ] },
+          COOLDOWN(300, 'Stretch as needed, drink lots of water.', '5-minute cooldown')
+        ]
+      },
+      {
+        id: 'w1d2', label: 'Day 2', name: 'Warrior Run Day', type: 'run',
+        intro: ['20 sets interval run (see video explanation). Each set = 10 sec run + 40 sec walk.',
+          'One 5-sec get-ready before the first run; the 20 run/walk sets then flow continuously.'],
+        levels: {
+          beginner:     'Beginner: 10 sec Medium to Low Intensity (20% - 50% effort) + 40 sec Low intensity (walking)',
+          intermediate: 'Intermediate: 10 sec Medium Intensity (50% effort) + 40 sec Low intensity (walking)',
+          advanced:     'Advanced: 10 sec High Intensity (80% effort) + 40 sec Low intensity (walking)'
+        },
+        effortShort: {
+          beginner: 'Medium to Low Intensity (20% - 50% effort)',
+          intermediate: 'Medium Intensity (50% effort)',
+          advanced: 'High Intensity (80% effort)'
+        },
+        vetDesc: '2 sets: 45 sec Plank-Ups, 60 sec rest between sets',
+        blocks: [
+          WARMUP,
+          { repeat: 20, section: 'Interval Run', roundWord: 'Round', continuous: true,
+            steps: [
+              W('Run', 10, '', { effort: true, how: 'Run' }),
+              R(40, 'Walk', 'Low intensity (walking)')
+            ] },
+          COOLDOWN(120, '', 'Cooldown walk', 'Cooldown walk'),
+          { veteran: true, repeat: 2, section: 'Veteran Challenge', roundWord: 'Set',
+            between: R(60),
+            steps: [ W('Plank-Ups', 45, '', { say: 'plank ups' }) ] },
+          { name: 'Stretch', sec: 180, kind: REST, section: 'Stretch', how: 'Stretch',
+            note: 'Hamstrings · Quad pulls · Hands above head REACH (lengthen your body). Make sure to diaphragm breathe.' }
+        ]
+      },
+      {
+        id: 'w1d3', label: 'Day 3', name: 'Warrior Muscle Day', type: 'muscle',
+        intro: ['3 interval cycles (doc estimates ~20 minutes).'],
+        vetDesc: '2 sets: Pull-up isometric hold burn out - hold at the midway point as long as you can (untimed; tap Done)',
+        blocks: [
+          WARMUP,
+          { repeat: 3, section: 'Interval Cycles', roundWord: 'Round',
+            between: R(120, 'Rest between cycles', '2 minutes rest, then repeat.'),
+            steps: [
+              W('Chin Ups or Pull-Ups', 20, 'Mod: Isometric hold at mid point', { say: 'chin ups or pull ups' }), R(30),
+              W('Leg Raises', 30, 'Mod: Knee Raises or sit-ups'), R(30),
+              W('Straight Bar Rows', 30, 'Mod: Explosive Jumping Jacks'), R(30),
+              W('Bench Dips', 30, 'Mod: Isometric hold at mid point'), R(30),
+              W('Step Ups', 60, '30 seconds each leg', { cueAt: 30, cue: 'Switch legs' })
+            ] },
+          { veteran: true, repeat: 2, section: 'Veteran Challenge', roundWord: 'Set',
+            between: R(null, 'Rest', 'Rest until ready (no rest time given) - tap Ready to start the next hold.'),
+            steps: [ W('Pull-Up Isometric Hold', null,
+              'Burn out: how many seconds can you hold a pull-up at the midway point? List total to your small team!',
+              { record: true, say: 'pull up isometric hold' }) ] },
+          COOLDOWN(300, '', '5-minute cooldown')
+        ]
+      },
+      {
+        id: 'w1d4', label: 'Day 4', name: 'Warrior Run Day', type: 'run',
+        intro: ['Building cardio endurance (22 minutes of running/rest + 5-sec get-ready before each run).',
+          'Pro-tip: focus on controlled breathing from the diaphragm during the run but especially during the rest - slow and deep, in through the nose, out through the mouth. Steady and unshakeable.'],
+        levelsSame: 'Day 4 has one plan for every level: 5 min run at 30% (very slow jog), 6 min at 40% (slow jog), 7 min at 50% (average jog).',
+        blocks: [
+          WARMUP,
+          W('Run - very slow jog', 300, '30% effort', { section: 'Cardio Endurance', say: 'very slow jog', how: 'Jog' }),
+          R(60, 'Rest', 'Breathe from the diaphragm: in through the nose, out through the mouth.', { section: 'Cardio Endurance' }),
+          W('Run - slow jog', 360, '40% effort', { section: 'Cardio Endurance', say: 'slow jog', how: 'Jog' }),
+          R(60, 'Rest', 'Breathe from the diaphragm: in through the nose, out through the mouth.', { section: 'Cardio Endurance' }),
+          W('Run - average jog', 420, '50% effort', { section: 'Cardio Endurance', say: 'average jog', how: 'Jog' }),
+          R(60, 'Rest', '', { section: 'Cardio Endurance' }),
+          W('Wall Sit', 60, '', { section: 'Cardio Endurance', say: 'wall sit' }),
+          COOLDOWN(300, '', '5-minute cooldown')
+        ]
+      },
+      {
+        id: 'w1d5', label: 'Day 5', name: 'Warrior COMBO Day', type: 'combo',
+        intro: ['Interval circuit - one time all the way through, then the final jog intervals.', 'End of Week 1 - did you get all 10 points?'],
+        blocks: [
+          WARMUP,
+          W('Push Ups', 30, 'Focus: form and rhythm', { section: 'Interval Circuit' }),
+          W('Explosive Jumping Jacks', 30, '', { section: 'Interval Circuit' }),
+          R(45, 'Walk', '', { section: 'Interval Circuit' }),
+          W('Sit-ups', 30, '', { section: 'Interval Circuit', say: 'sit ups' }),
+          W('Explosive Jumping Jacks', 30, '', { section: 'Interval Circuit' }),
+          R(45, 'Walk', '', { section: 'Interval Circuit' }),
+          W('Supermans', 30, '', { section: 'Interval Circuit' }),
+          W('Explosive Jumping Jacks', 30, '', { section: 'Interval Circuit' }),
+          R(45, 'Walk', '', { section: 'Interval Circuit' }),
+          W('Glute Bridges', 30, '', { section: 'Interval Circuit' }),
+          W('Explosive Jumping Jacks', 30, '', { section: 'Interval Circuit' }),
+          R(45, 'Walk', '', { section: 'Interval Circuit' }),
+          W('Mountain Climbers', 20, '', { section: 'Interval Circuit' }),
+          W('Explosive Jumping Jacks', 30, '', { section: 'Interval Circuit' }),
+          R(120, 'Walk', 'As soon as this walk is done, gear up for the final intervals.', { section: 'Interval Circuit' }),
+          W('Jog', 300, '40% effort', { section: 'Final Intervals' }),
+          R(60, 'Walk', '', { section: 'Final Intervals' }),
+          W('Jog', 300, '50% effort', { section: 'Final Intervals' }),
+          COOLDOWN(300, '', '5-minute cooldown')
+        ]
+      }
+    ]
+  }
+];
+const LEVELS = [['beginner', 'Beginner'], ['intermediate', 'Intermediate'], ['advanced', 'Advanced']];
+
+/* ===================== helpers ===================== */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function fmt(sec) {
+  sec = Math.max(0, Math.round(sec));
+  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+  return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(s).padStart(2, '0');
+}
+function speakDur(sec) {
+  const m = Math.floor(sec / 60), s = Math.round(sec % 60), p = [];
+  if (m) p.push(m + (m === 1 ? ' minute' : ' minutes'));
+  if (s || !m) p.push(s + (s === 1 ? ' second' : ' seconds'));
+  return p.join(' ');
+}
+const spoken = s => s.say || s.name;
+function howHtml(how, title) {
+  if (!how) return '';
+  const dl = how.demos || [];
+  const link = (d, cls) => `<a class="demo${cls}" href="${esc(demoUrl(d[1]))}" target="_blank" rel="noopener">\u25B6 ${esc(d[0])}</a>`;
+  const primary = dl.length ? link(dl[0], ' mini') : '';          // up top so it's reachable without scrolling
+  const demos = dl.slice(1).map(d => link(d, ' alt')).join('');   // extra demos (mods/variations)
+  const a = how.anim;
+  const anim = a ? `<div class="animbox"><div class="anim">` +
+      a.frames.map((f, i) => `<img src="${esc(f)}" alt="" class="${i ? 'f2' : ''}" loading="eager" decoding="async">`).join('') +
+      `</div><a class="cred" href="${esc(a.href)}" target="_blank" rel="noopener">${esc(a.credit)}</a></div>` : '';
+  return anim + `<div class="howt">${esc(title || 'How to do it')}${primary}</div>` +
+    `<ul>${how.cues.map(c => `<li>${esc(c)}</li>`).join('')}</ul>` +
+    (how.easier ? `<div class="easy"><b>Easier option:</b> ${esc(how.easier)}</div>` : '') +
+    (demos ? `<div class="demos">${demos}</div>` : '');
+}
+
+/* Flatten a day's blocks into a linear list of steps. */
+function expandDay(day, opts) {
+  const out = [];
+  const add = (s, meta) => out.push(Object.assign({}, s, meta));
+  for (const b of day.blocks) {
+    if (b.veteran && !opts.veteran) continue;
+    if (b.repeat) {
+      for (let r = 1; r <= b.repeat; r++) {
+        const meta = { section: b.section || '', round: r, rounds: b.repeat, roundWord: b.roundWord || 'Round', veteran: !!b.veteran };
+        let workSeen = false;
+        b.steps.forEach(s => {
+          const m = Object.assign({}, meta);
+          if (b.continuous && s.kind === WORK) { if (r > 1 || workSeen) m.noReady = true; workSeen = true; }
+          add(s, m);
+        });
+        if (b.between && r < b.repeat) add(b.between, Object.assign({}, meta, { betweenRounds: true }));
+      }
+    } else {
+      add(b, { section: b.section || '', veteran: !!b.veteran });
+    }
+  }
+  out.forEach(s => {
+    if (s.effort && day.effortShort) s.effortText = day.effortShort[opts.level] || '';
+  });
+  // insert a 5-second "Get ready" step before every work step (except continuous run intervals)
+  const res = [];
+  out.forEach(s => {
+    if (s.kind === WORK && !s.noReady) {
+      res.push({ name: 'Get ready: ' + s.name, sec: GET_READY_SEC, kind: READY, target: s, how: s.how || s.name,
+        section: s.section, round: s.round, rounds: s.rounds, roundWord: s.roundWord, veteran: s.veteran,
+        betweenRounds: s.betweenRounds, effortText: s.effortText });
+    }
+    res.push(s);
+  });
+  return res;
+}
+const fixedTotal = steps => steps.reduce((a, s) => a + (s.sec || 0), 0);
+const openCount = steps => steps.filter(s => s.sec == null && s.kind === WORK).length;
+const readyCount = steps => steps.filter(s => s.kind === READY).length;
+
+/* ===================== state ===================== */
+const UI = { week: 0, day: 0, level: 'beginner', veteran: false };
+let muted = false;
+try { muted = localStorage.getItem('warriorTimerMuted') === '1'; } catch (e) {}
+const T = { steps: [], idx: 0, started: false, running: false, stepStart: 0, stepAccum: 0, fired: {},
+  activeMs: 0, activeStart: 0, startedAt: 0, results: [], day: null };
+
+const curWeek = () => WEEKS[UI.week];
+const curDay = () => curWeek().days[UI.day];
+
+/* ===================== setup UI ===================== */
+function buildSetup() {
+  const ws = $('weekSel');
+  if (WEEKS.length > 1) {
+    $('weekWrap').classList.remove('hidden');
+    ws.innerHTML = WEEKS.map((w, i) => `<option value="${i}">${esc(w.title)}</option>`).join('');
+    ws.value = UI.week;
+  }
+  $('weekLabel').textContent = curWeek().title + ' \u00b7 workout day';
+  $('days').innerHTML = curWeek().days.map((d, i) => {
+    const tot = fixedTotal(expandDay(d, { veteran: false, level: UI.level }));
+    return `<button class="day${i === UI.day ? ' sel' : ''}" data-i="${i}"><b>${esc(d.label)}</b><small>${esc(d.name.replace(/^Warrior /, ''))}</small><small class="dt">${fmt(tot)}</small></button>`;
+  }).join('');
+  $('levelSeg').innerHTML = LEVELS.map(([k, l]) => `<button data-l="${k}" class="${k === UI.level ? 'sel' : ''}">${l}</button>`).join('');
+  renderSetup();
+}
+function renderSetup() {
+  const d = curDay();
+  document.querySelectorAll('.day').forEach(b => b.classList.toggle('sel', +b.dataset.i === UI.day));
+  document.querySelectorAll('#levelSeg button').forEach(b => b.classList.toggle('sel', b.dataset.l === UI.level));
+  const isRun = d.type === 'run';
+  $('levelWrap').classList.toggle('hidden', !isRun);
+  if (isRun) $('effortTxt').textContent = d.levels ? d.levels[UI.level] : (d.levelsSame || '');
+  const hasVet = d.blocks.some(b => b.veteran);
+  $('vetRow').classList.toggle('hidden', !hasVet);
+  $('vetDesc').textContent = hasVet ? 'Optional add-on: ' + d.vetDesc : '';
+  $('vetSw').setAttribute('aria-checked', String(UI.veteran && hasVet));
+  $('soundSw').setAttribute('aria-checked', String(!muted));
+
+  const steps = expandDay(d, { veteran: UI.veteran && hasVet, level: UI.level });
+  const open = openCount(steps);
+  $('totalTxt').textContent = fmt(fixedTotal(steps));
+  const nReady = readyCount(steps), nMain = steps.length - nReady;
+  $('totalMeta').innerHTML = `${esc(d.label)} &middot; ${esc(d.name)}<br>${nMain} steps${open ? ` + ${open} untimed hold${open > 1 ? 's' : ''}` : ''}<br>incl. ${nReady} \u00d7 ${GET_READY_SEC}s get-ready`;
+  $('intro').innerHTML = (d.intro || []).map(t => `<div>${esc(t)}</div>`).join('');
+
+  let html = '', lastGrp = '', pendingReady = 0;
+  steps.forEach(s => {
+    if (s.kind === READY) { pendingReady = s.sec; return; }
+    const g = s.section + (s.round && !s.betweenRounds ? ` \u00b7 ${s.roundWord} ${s.round} of ${s.rounds}` : '');
+    if (!s.betweenRounds && g !== lastGrp) { html += `<li class="grp${s.veteran ? ' vet' : ''}">${esc(g)}</li>`; lastGrp = g; }
+    const note = [s.effortText, s.note].filter(Boolean).join(' \u2014 ');
+    const how = howFor(s);
+    html += `<li class="st ${s.kind}${how ? ' has-how' : ''}"><span class="dot"></span><span class="n">${esc(s.name)}` +
+      (how ? `<span class="chev">How \u25BE</span>` : '') +
+      (note ? `<small>${esc(note)}</small>` : '') +
+      (how ? `<div class="howbox">${howHtml(how)}</div>` : '') +
+      `</span><span class="s">${s.sec == null ? 'untimed' : fmt(s.sec)}${pendingReady ? `<span class="gr">+0:0${pendingReady} get ready</span>` : ''}</span></li>`;
+    pendingReady = 0;
+  });
+  $('stepList').innerHTML = html;
+}
+
+$('stepList').addEventListener('click', e => {
+  if (e.target.closest('a')) return;              // demo links open normally
+  const li = e.target.closest('.st.has-how'); if (li) li.classList.toggle('open');
+});
+$('days').addEventListener('click', e => {
+  const b = e.target.closest('.day'); if (!b) return;
+  UI.day = +b.dataset.i; renderSetup();
+});
+$('levelSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  UI.level = b.dataset.l; renderSetup();
+});
+$('weekSel').addEventListener('change', e => { UI.week = +e.target.value; UI.day = 0; buildSetup(); });
+$('vetSw').addEventListener('click', () => { UI.veteran = !UI.veteran; renderSetup(); });
+$('soundSw').addEventListener('click', () => { setMuted(!muted); renderSetup(); });
+
+/* ===================== audio + speech ===================== */
+let actx = null;
+function initAudio() {
+  try {
+    if (!actx) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) actx = new AC(); }
+    if (actx) {
+      if (actx.state !== 'running') actx.resume().catch(() => {});
+      const b = actx.createBuffer(1, 1, 22050), src = actx.createBufferSource();   // silent unlock (iOS)
+      src.buffer = b; src.connect(actx.destination); src.start(0);
+    }
+  } catch (e) {}
+}
+function beep(freq, dur, vol) {
+  if (muted || !actx) return;
+  try {
+    if (actx.state !== 'running') actx.resume().catch(() => {});
+    const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain();
+    o.type = 'sine'; o.frequency.value = freq || 880;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol || 0.4, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + (dur || 0.12));
+    o.connect(g); g.connect(actx.destination);
+    o.start(t); o.stop(t + (dur || 0.12) + 0.03);
+  } catch (e) {}
+}
+function beepSeq(list) { list.forEach(([f, d, delay]) => setTimeout(() => beep(f, d), delay)); }
+
+const synth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
+let voice = null, speechUnlocked = false;
+function pickVoice() {
+  if (!synth) return;
+  const vs = synth.getVoices() || [];
+  voice = vs.find(v => /^en[-_]US/i.test(v.lang) && /Samantha|Alex|Aaron|Google US|Ava|Allison/i.test(v.name))
+       || vs.find(v => /^en[-_]US/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
+}
+if (synth) {
+  pickVoice();
+  if (synth.addEventListener) synth.addEventListener('voiceschanged', pickVoice); else synth.onvoiceschanged = pickVoice;
+}
+function say(text, interrupt, rate) {
+  if (muted || !synth || !text) return;
+  try {
+    if (interrupt !== false && (synth.speaking || synth.pending)) synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    if (voice) { u.voice = voice; u.lang = voice.lang; } else u.lang = 'en-US';
+    u.rate = rate || 1.05; u.pitch = 1; u.volume = 1;
+    synth.speak(u);
+    speechUnlocked = true;
+  } catch (e) {}
+}
+function unlockSpeech() {           // must run inside a user tap on iOS
+  if (!synth || speechUnlocked) return;
+  try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; synth.speak(u); speechUnlocked = true; } catch (e) {}
+}
+function setMuted(m) {
+  muted = m;
+  try { localStorage.setItem('warriorTimerMuted', m ? '1' : '0'); } catch (e) {}
+  if (m && synth) synth.cancel();
+  $('btnMute').innerHTML = m ? '&#x1F507;' : '&#x1F50A;';
+  $('btnMute').setAttribute('aria-label', m ? 'Unmute' : 'Mute');
+}
+
+/* ===================== wake lock ===================== */
+let wakeLock = null;
+const wakeSupported = 'wakeLock' in navigator;
+async function requestWake() {
+  if (!wakeSupported) { $('wakeTxt').textContent = 'Screen wake lock not supported here \u2014 set Auto-Lock to Never.'; return; }
+  if (wakeLock) return;
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    $('wakeTxt').textContent = 'Screen will stay on while the timer runs.';
+    wakeLock.addEventListener('release', () => {
+      wakeLock = null;
+      if (T.running) $('wakeTxt').textContent = 'Screen lock released \u2014 it will be re-requested when you return.';
+    });
+    if (!T.running) releaseWake();
+  } catch (e) {
+    wakeLock = null;
+    $('wakeTxt').textContent = 'Couldn\u2019t keep the screen on (' + (e && e.name || 'error') + ') \u2014 set Auto-Lock to Never.';
+  }
+}
+function releaseWake() {
+  const wl = wakeLock; wakeLock = null;
+  if (wl) { try { wl.release(); } catch (e) {} }
+}
+
+/* ===================== timer engine (timestamp-based) ===================== */
+const now = () => Date.now();
+const curStep = () => T.steps[T.idx];
+const durMs = s => (s && s.sec != null) ? s.sec * 1000 : null;
+function stepElapsed(t) { return T.stepAccum + (T.running ? t - T.stepStart : 0); }
+
+function startWorkout() {
+  initAudio();
+  const d = curDay();
+  const hasVet = d.blocks.some(b => b.veteran);
+  T.day = d;
+  T.steps = expandDay(d, { veteran: UI.veteran && hasVet, level: UI.level });
+  T.idx = 0; T.started = true; T.running = true; T.results = []; T.fired = {};
+  const t = now();
+  T.stepStart = t; T.stepAccum = 0; T.activeMs = 0; T.activeStart = t; T.startedAt = t;
+  const seen = {};
+  T.steps.forEach(s => { const hw = howFor(s); if (hw && hw.anim) hw.anim.frames.forEach(f => { if (!seen[f]) { seen[f] = 1; const im = new Image(); im.src = f; } }); });
+  T.levelLabel = d.type === 'run' ? (LEVELS.find(l => l[0] === UI.level) || [])[1] : '';
+  show('timer');
+  if (muted) unlockSpeech();
+  onStepStart(null);                 // first announcement happens inside the tap = speech unlock
+  requestWake();
+  render();
+}
+
+function prevMain(i) { for (let j = i - 1; j >= 0; j--) if (T.steps[j].kind !== READY) return T.steps[j]; return null; }
+function nextMain(i) { for (let j = i + 1; j < T.steps.length; j++) if (T.steps[j].kind !== READY) return T.steps[j]; return null; }
+
+function onStepStart(remainingSec) {
+  const s = curStep(); if (!s) return;
+  const prev = T.steps[T.idx - 1], p = prevMain(T.idx);
+  const roundStart = s.round && s.rounds > 1 && !s.betweenRounds && (!p || p.round !== s.round || p.section !== s.section);
+  const roundTxt = roundStart ? `${s.roundWord} ${s.round} of ${s.rounds}` : '';
+  const parts = [];
+  let rate;
+  if (remainingSec != null) {                                    // catching up after backgrounding
+    parts.push(spoken(s.kind === READY ? s.target : s), speakDur(remainingSec) + ' left');
+  } else if (s.kind === READY) {
+    if (s.veteran && (!p || !p.veteran)) parts.push('Veteran challenge');
+    parts.push('Get ready for ' + spoken(s.target));
+    rate = 1.12;
+  } else if (s.kind === WORK) {
+    if (prev && prev.kind === READY) {
+      parts.push('Go!');
+      if (roundTxt) parts.push(roundTxt);
+      parts.push(s.sec == null ? 'Hold as long as you can, then tap Done' : speakDur(s.sec));
+    } else if (s.noReady) {
+      parts.push('Go!', roundTxt || spoken(s));                    // continuous run intervals
+    } else {
+      if (roundTxt) parts.push(roundTxt);
+      parts.push(spoken(s), s.sec == null ? 'Hold as long as you can, then tap Done' : speakDur(s.sec));
+    }
+  } else {
+    if (s.betweenRounds) parts.push(`${s.roundWord} ${s.round} of ${s.rounds} done`);
+    parts.push(spoken(s), s.sec == null ? 'Tap Ready when you are ready' : speakDur(s.sec));
+  }
+  if (s.kind === WORK) beepSeq([[1320, 0.12, 0], [1320, 0.18, 160]]);
+  else if (s.kind === READY) beep(740, 0.12);
+  else beep(660, 0.25);
+  say(parts.reduce((a, x) => a ? a + (/[.!?]$/.test(a) ? ' ' : '. ') + x : x, ''), true, rate);
+}
+
+/* Cues: get-ready steps own the "3, 2, 1" before an exercise (then "Go!" at the start of the work).
+   Rests that lead into a get-ready stay quiet at the end, so nothing doubles up.
+   Work steps count "3, 2, 1" into their rest. Continuous run/walk intervals count into each run. */
+function handleCues(t) {
+  const s = curStep(), d = durMs(s); if (d == null) return;
+  const rem = d - stepElapsed(t);
+  const cue = (key, atMs, fn) => {
+    if (T.fired[key]) return;
+    if (rem <= atMs) { T.fired[key] = 1; if (atMs - rem < 1200) fn(); }   // skip stale cues after backgrounding
+  };
+  if (s.cueAt) cue('mid', s.cueAt * 1000, () => { beep(990, 0.15); say(s.cue); });
+  const nx = T.steps[T.idx + 1];
+  const countdown = d >= 4000 && !(s.kind === REST && nx && nx.kind === READY);
+  if (countdown) [3, 2, 1].forEach(n => cue('c' + n, n * 1000, () => { beep(n === 1 ? 1046 : 880, 0.09, 0.3); say(String(n)); }));
+}
+
+function tick() {
+  if (!T.started) return;
+  const t = now();
+  if (T.running) {
+    let changed = false, late = 0, guard = 0;
+    while (guard++ < 2000) {
+      const s = curStep(), d = durMs(s);
+      if (d == null) break;                         // open-ended step: waits for Done
+      if (stepElapsed(t) < d) break;
+      const endTs = T.stepStart + (d - T.stepAccum);   // exact moment the step ended -> no drift
+      T.idx++; T.stepStart = endTs; T.stepAccum = 0; T.fired = {}; changed = true; late = t - endTs;
+      if (T.idx >= T.steps.length) { finish(endTs); return; }
+    }
+    if (changed) {
+      const s = curStep(), d = durMs(s);
+      if (late > 1500 && d != null) {
+        const remSec = Math.ceil((d - stepElapsed(t)) / 1000);
+        [3, 2, 1].forEach(n => { if (remSec <= n) T.fired['c' + n] = 1; });
+        onStepStart(remSec);
+      } else onStepStart(null);
+    }
+    handleCues(t);
+  }
+  render(t);
+}
+
+function pause() {
+  if (!T.running) return;
+  const t = now();
+  T.stepAccum += t - T.stepStart; T.activeMs += t - T.activeStart; T.running = false;
+  releaseWake();
+  if (synth) synth.cancel();
+  render(t);
+}
+function resume() {
+  if (T.running || !T.started) return;
+  initAudio();
+  const t = now();
+  T.stepStart = t; T.activeStart = t; T.running = true;
+  requestWake();
+  const s = curStep(), d = durMs(s);
+  if (s.kind === READY) say('Get ready for ' + spoken(s.target));
+  else say('Go. ' + spoken(s) + (d != null ? ', ' + speakDur(Math.ceil((d - T.stepAccum) / 1000)) + ' left' : ''));
+  render(t);
+}
+function goTo(i) {
+  const t = now();
+  const s = curStep();
+  if (s && s.record && i > T.idx) {
+    T.results.push({ name: s.name, label: (s.roundWord || 'Set') + ' ' + (s.round || 1), sec: Math.round(stepElapsed(t) / 1000) });
+  }
+  if (i >= T.steps.length) {
+    if (T.running) { T.activeMs += t - T.activeStart; T.activeStart = t; }
+    finish(t, true); return;
+  }
+  T.idx = Math.max(0, i); T.stepAccum = 0; T.stepStart = t; T.fired = {};
+  if (T.running) onStepStart(null); else if (synth) synth.cancel();
+  render(t);
+}
+function finish(endTs, alreadyCounted) {
+  if (T.running && !alreadyCounted) T.activeMs += endTs - T.activeStart;
+  T.running = false; T.started = false;
+  releaseWake();
+  const total = Math.round(T.activeMs / 1000);
+  const wall = Math.round((now() - T.startedAt) / 1000);
+  $('doneName').textContent = `${curWeek().title} \u00b7 ${T.day.label} \u00b7 ${T.day.name}` + (T.levelLabel ? ` \u00b7 ${T.levelLabel}` : '');
+  $('doneTime').textContent = fmt(total);
+  $('doneSub').textContent = 'Total workout time' + (wall - total > 5 ? ` \u00b7 ${fmt(wall)} including pauses` : '');
+  if (T.results.length) {
+    $('doneRes').innerHTML = '<b>Veteran Challenge holds</b><br>' +
+      T.results.map(r => `${esc(r.label)}: ${r.sec} s`).join('<br>') +
+      `<br><b>Total: ${T.results.reduce((a, r) => a + r.sec, 0)} s</b> &mdash; list it to your small team!`;
+    $('doneRes').classList.remove('hidden');
+  } else $('doneRes').classList.add('hidden');
+  show('done');
+  beepSeq([[784, 0.15, 0], [988, 0.15, 180], [1318, 0.35, 360]]);
+  say('Workout complete. Great work, Warrior. Total time ' + speakDur(total) + '.');
+}
+
+/* ===================== render ===================== */
+let lastBodyKind = '', lastHowIdx = -1;
+function setText(el, v) { if (el.textContent !== v) el.textContent = v; }
+function render(t) {
+  if (!T.started) return;
+  t = t || now();
+  const s = curStep(); if (!s) return;
+  const d = durMs(s), el = stepElapsed(t);
+  if (lastBodyKind !== s.kind) {
+    document.body.classList.toggle('rest', s.kind === REST);
+    document.body.classList.toggle('ready', s.kind === READY);
+    lastBodyKind = s.kind;
+  }
+  const show_ = s.kind === READY ? s.target : s;            // what the stage describes
+  $('timer').classList.toggle('paused', !T.running);
+
+  let phase = s.kind === WORK ? 'Work' : 'Rest';
+  if (s.section === 'Warm-Up') phase = 'Warm-Up';
+  else if (s.section === 'Cooldown') phase = 'Cooldown';
+  else if (s.section === 'Stretch') phase = 'Stretch';
+  else if (s.name === 'Walk' || /walk/i.test(s.name)) phase = 'Walk';
+  if (s.kind === READY) phase = 'Get Ready';
+  if (s.veteran) phase = 'Veteran \u00b7 ' + phase;
+  setText($('phase'), T.running ? phase : 'Paused');
+  setText($('round'), s.round && s.rounds > 1 ? `${s.roundWord} ${s.round} of ${s.rounds}` : (s.section && s.section !== phase ? s.section : ''));
+  setText($('exName'), show_.name);
+  setText($('exNote'), show_.note || '');
+  $('exEff').classList.toggle('hidden', !show_.effortText);
+  setText($('exEff'), show_.effortText ? (T.levelLabel + ': ' + show_.effortText) : '');
+
+  // how-to panel: the current exercise (or the one you're getting ready for); on rests, preview the next exercise
+  if (lastHowIdx !== T.idx) {
+    lastHowIdx = T.idx;
+    let how = howFor(show_), title = 'How to do it';
+    if (!how && s.kind === REST) {
+      const nm = nextMain(T.idx);
+      if (nm && nm.kind === WORK && howFor(nm)) { how = howFor(nm); title = 'Up next \u2014 how to do ' + nm.name; }
+    }
+    $('how').innerHTML = howHtml(how, title);
+    $('how').classList.toggle('hidden', !how);
+    $('how').scrollTop = 0;
+  }
+
+  let countTxt, lbl;
+  if (d == null) { countTxt = fmt(Math.floor(el / 1000)); lbl = s.kind === WORK ? 'Hold \u2014 tap Done' : 'Rest \u2014 tap Ready'; }
+  else { countTxt = fmt(Math.ceil((d - el) / 1000)); lbl = T.running ? (s.kind === READY ? 'Get ready' : '') : 'Paused \u2014 tap Resume'; }
+  setText($('count'), countTxt);
+  $('count').classList.toggle('long', countTxt.length > 5);
+  setText($('clockLbl'), lbl);
+  $('sBar').style.width = d == null ? '100%' : Math.min(100, (el / d) * 100).toFixed(2) + '%';
+
+  const nx = s.kind === READY ? s.target : nextMain(T.idx);
+  const nxHtml = nx ? `<b>Next up</b>${esc(nx.name)}<span class="ns">${nx.sec == null ? 'untimed' : fmt(nx.sec)}</span>`
+                    : '<b>Next up</b>Finish!';
+  if ($('nextup').innerHTML !== nxHtml) $('nextup').innerHTML = nxHtml;
+
+  // overall progress
+  const total = fixedTotal(T.steps);
+  let doneSec = 0; for (let i = 0; i < T.idx; i++) doneSec += T.steps[i].sec || 0;
+  const curDone = d == null ? 0 : Math.min(d, el) / 1000;
+  const left = Math.max(0, total - doneSec - curDone);
+  const activeNow = (T.activeMs + (T.running ? t - T.activeStart : 0)) / 1000;
+  setText($('ovTxt'), `${fmt(activeNow)} elapsed \u00b7 ${fmt(left)} left`);
+  $('ovBar').style.width = total ? Math.min(100, ((doneSec + curDone) / total) * 100).toFixed(2) + '%' : '0';
+
+  setText($('btnPlay'), T.running ? 'Pause' : 'Resume');
+  const skipTxt = d == null ? (s.kind === WORK ? 'Done \u2713' : 'Ready \u23ED') : 'Skip \u23ED';
+  setText($('btnSkip'), skipTxt);
+}
+
+function show(which) {
+  ['setup', 'timer', 'done'].forEach(id => $(id).classList.toggle('hidden', id !== which));
+  if (which !== 'timer') { document.body.classList.remove('rest', 'ready'); lastBodyKind = ''; }
+  lastHowIdx = -1;
+  window.scrollTo(0, 0);
+}
+
+/* ===================== controls ===================== */
+$('btnStart').addEventListener('click', startWorkout);
+$('btnPlay').addEventListener('click', () => { T.running ? pause() : resume(); });
+$('btnSkip').addEventListener('click', () => { initAudio(); goTo(T.idx + 1); });
+$('btnBack').addEventListener('click', () => {
+  initAudio();
+  const el = stepElapsed(now());
+  if (el > 3000 || T.idx === 0) goTo(T.idx);   // restart current step
+  else goTo(T.idx - 1);
+});
+$('btnMute').addEventListener('click', () => { setMuted(!muted); if (!muted) { initAudio(); unlockSpeech(); say('Sound on', true); } });
+$('btnEnd').addEventListener('click', () => {
+  const wasRunning = T.running;
+  if (wasRunning) pause();
+  if (confirm('End this workout and go back to the workout list?')) {
+    T.started = false; T.running = false; releaseWake(); if (synth) synth.cancel();
+    show('setup'); renderSetup();
+  } else if (wasRunning) resume();
+});
+$('btnAgain').addEventListener('click', () => { show('setup'); renderSetup(); });
+$('how').addEventListener('click', e => { if (e.target.closest('a') && T.running) pause(); });  // demo opens in a new tab; timer waits
+document.addEventListener('keydown', e => {
+  if (!T.started) return;
+  if (e.code === 'Space') { e.preventDefault(); T.running ? pause() : resume(); }
+  else if (e.code === 'ArrowRight') goTo(T.idx + 1);
+  else if (e.code === 'ArrowLeft') $('btnBack').click();
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    if (actx && actx.state !== 'running') actx.resume().catch(() => {});
+    if (T.running) requestWake();
+    tick();                                    // catch up immediately using timestamps
+  }
+});
+window.addEventListener('pageshow', () => tick());
+
+setInterval(tick, 100);
+
+/* Make sure the phone runs the newest version (python http.server can't send no-store headers). */
+(function versionCheck() {
+  if (!window.fetch) return;
+  fetch(location.pathname + '?vcheck=' + Date.now(), { cache: 'no-store' })
+    .then(r => r.ok ? r.text() : '')
+    .then(txt => {
+      const m = txt.match(/const APP_VERSION = '([^']+)'/);
+      if (!m || m[1] === APP_VERSION || T.started) return;
+      let tried = ''; try { tried = sessionStorage.getItem('warriorReloadedFor') || ''; } catch (e) {}
+      if (tried === m[1]) return;
+      try { sessionStorage.setItem('warriorReloadedFor', m[1]); } catch (e) {}
+      location.replace(location.pathname + '?v=' + encodeURIComponent(m[1]));
+    }).catch(() => {});
+})();
+setMuted(muted);
+buildSetup();
+</script>
+</body>
+</html>

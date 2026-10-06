@@ -1,0 +1,25 @@
+Exercise images used by the Warrior Workout Timer
+==================================================
+
+1) free-exercise-db by yuhonas - https://github.com/yuhonas/free-exercise-db
+   License: The Unlicense (public domain dedication), see LICENSE.md in that repo
+   (data/images derived from wrkout/exercises.json, also Unlicense).
+   Frames downloaded from raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/<Name>/{0,1}.jpg,
+   resized to 400px wide and recompressed:
+     pushups-0/1.jpg            <- Pushups
+     plank-0.jpg                <- Plank (frame 1 only: the forearm-plank hold)
+     glute-bridge-0/1.jpg       <- Butt_Lift_Bridge
+     chin-up-0/1.jpg            <- Chin-Up
+     sit-up-0/1.jpg             <- Sit-Up
+     inverted-row-0/1.jpg       <- Inverted_Row
+     bench-dips-0/1.jpg         <- Bench_Dips
+     superman-0/1.jpg           <- Superman
+     mountain-climbers-0/1.jpg  <- Mountain_Climbers
+     running-0/1.jpg            <- Trail_Running_Walking
+
+2) leg-raises.gif
+   Source: "Legraises.gif" by Wensceslao, Wikimedia Commons
+   https://commons.wikimedia.org/wiki/File:Legraises.gif
+   License: CC BY-SA 4.0 - https://creativecommons.org/licenses/by-sa/4.0/
+   Changes: resized to 400x300, every other frame kept, converted to 2-colour.
+   This modified GIF is likewise licensed CC BY-SA 4.0.
