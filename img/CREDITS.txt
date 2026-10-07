@@ -16,6 +16,20 @@ Exercise images used by the Warrior Workout Timer
      superman-0/1.jpg           <- Superman
      mountain-climbers-0/1.jpg  <- Mountain_Climbers
      running-0/1.jpg            <- Trail_Running_Walking
+   Added for Weeks 2-8 (frames letterboxed to 400x267 where the source is portrait):
+     air-squat-0/1.jpg              <- Bodyweight_Squat
+     db-squat-0/1.jpg               <- Dumbbell_Squat
+     jump-squat-0/1.jpg             <- Freehand_Jump_Squat
+     russian-twist-0/1.jpg          <- Russian_Twist
+     bicep-curl-0/1.jpg             <- Dumbbell_Bicep_Curl
+     shoulder-press-0/1.jpg         <- Dumbbell_Shoulder_Press
+     overhead-triceps-0/1.jpg       <- Standing_Dumbbell_Triceps_Extension
+     pec-fly-0/1.jpg                <- Dumbbell_Flyes
+     bulgarian-split-squat-0/1.jpg  <- Split_Squat_with_Dumbbells (rear foot elevated)
+     hanging-leg-raise-0/1.jpg      <- Hanging_Leg_Raise
+     db-row-0/1.jpg                 <- Bent_Over_Two-Dumbbell_Row
+     walking-lunge-0/1.jpg          <- Bodyweight_Walking_Lunge
+     pullups-0/1.jpg                <- Pullups
 
 2) leg-raises.gif
    Source: "Legraises.gif" by Wensceslao, Wikimedia Commons
@@ -23,3 +37,15 @@ Exercise images used by the Warrior Workout Timer
    License: CC BY-SA 4.0 - https://creativecommons.org/licenses/by-sa/4.0/
    Changes: resized to 400x300, every other frame kept, converted to 2-colour.
    This modified GIF is likewise licensed CC BY-SA 4.0.
+
+3) burpees.gif
+   Source: "Burpees.gif" by Wensceslao, Wikimedia Commons
+   https://commons.wikimedia.org/wiki/File:Burpees.gif
+   License: CC BY-SA 4.0 - https://creativecommons.org/licenses/by-sa/4.0/
+   Changes: resized to 400x300, every other frame kept, converted to 2-colour. Modified GIF is CC BY-SA 4.0.
+
+4) high-knees.gif
+   Source: "High knees.gif" by Wensceslao, Wikimedia Commons
+   https://commons.wikimedia.org/wiki/File:High_knees.gif
+   License: CC BY-SA 4.0 - https://creativecommons.org/licenses/by-sa/4.0/
+   Changes: resized to 400x300, converted to 2-colour. Modified GIF is CC BY-SA 4.0.

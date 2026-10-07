@@ -16,7 +16,7 @@
 <style>
   :root{
     --bg:#0a0a0c; --panel:#16161a; --panel2:#1f1f25; --line:#2c2c34;
-    --text:#f6f6f6; --muted:#a5a5b0; --work:#ff7a1a; --rest:#22c55e; --ready:#38bdf8; --accent:var(--work);
+    --text:#f6f6f6; --muted:#a5a5b0; --work:#ff7a1a; --rest:#22c55e; --ready:#38bdf8; --log:#a78bfa; --accent:var(--work);
     --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -41,6 +41,17 @@
   .seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
   .seg button{flex:1;border:0;background:transparent;padding:11px 4px;border-radius:9px;font-size:15px;font-weight:600;color:var(--muted)}
   .seg button.sel{background:var(--work);color:#000}
+  .seg button small{display:block;font-size:11.5px;font-weight:600;opacity:.8;margin-top:1px}
+  .weeks{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px}
+  .weeks button{border:0;background:transparent;padding:11px 0;border-radius:9px;font-size:18px;font-weight:800;color:var(--muted)}
+  .weeks button.sel{background:var(--work);color:#000}
+  .wnote{background:var(--panel);border-left:4px solid var(--ready);border-radius:8px;padding:8px 12px;margin-top:8px;font-size:13.5px;line-height:1.35;color:#d6d6de}
+  .tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:6px}
+  .tbl{border-collapse:collapse;width:100%;font-size:13.5px;line-height:1.3}
+  .tbl th,.tbl td{border-bottom:1px solid var(--line);padding:6px;text-align:left;white-space:nowrap;vertical-align:top}
+  .tbl th{color:var(--muted);font-weight:700;font-size:12px}
+  .tbl td.rg{white-space:normal;color:var(--muted);font-size:12px;min-width:150px}
+  .hist{margin-top:6px}
   .effort{background:var(--panel);border-left:4px solid var(--work);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:15px;line-height:1.35}
   .row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:8px}
   .row .t{font-size:16px;font-weight:600}
@@ -60,6 +71,7 @@
   .st{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border-bottom:1px solid var(--line)}
   .dot{width:10px;height:10px;border-radius:50%;margin-top:6px;flex:none;background:var(--work)}
   .st.rest .dot{background:var(--rest)}
+  .st.log .dot{background:var(--log)}
   .st .n{flex:1;font-size:16px;line-height:1.3}
   .st .n small{display:block;color:var(--muted);font-size:12.5px;line-height:1.3;margin-top:1px}
   .st .s{font-variant-numeric:tabular-nums;font-weight:600;color:var(--muted);white-space:nowrap}
@@ -96,6 +108,12 @@
   #timer{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;padding:calc(10px + var(--safe-t)) 14px calc(14px + var(--safe-b));max-width:900px;margin:0 auto}
   body.rest{--accent:var(--rest)}
   body.ready{--accent:var(--ready)}
+  body.log{--accent:var(--log)}
+  .logbox{display:flex;align-items:center;justify-content:center;gap:12px;margin:6px 0}
+  .logbox button{width:76px;height:76px;flex:none;border-radius:50%;border:0;background:var(--panel2);font-size:40px;font-weight:800;line-height:1}
+  .logbox input{width:min(44vw,220px);font-size:min(17vw,9vh);font-weight:800;text-align:center;background:var(--panel);color:var(--accent);border:3px solid var(--accent);border-radius:18px;padding:4px 6px;font-family:inherit;font-variant-numeric:tabular-nums;-moz-appearance:textfield;appearance:textfield}
+  .logbox input::-webkit-inner-spin-button,.logbox input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+  .lrange{font-size:14px;color:var(--muted);text-align:center;margin-top:4px;line-height:1.35}
   .topline{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
   .iconbtn{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:9px 12px;font-size:15px;font-weight:600;min-width:44px}
   .ovbar{height:6px;background:var(--panel2);border-radius:4px;overflow:hidden;margin:8px 0 10px}
@@ -153,7 +171,8 @@
   #done .dname{color:var(--muted);font-size:17px}
   #done .ttl{font-size:64px;font-weight:900;font-variant-numeric:tabular-nums;margin:22px 0 2px;color:var(--work)}
   #done .tsub{color:var(--muted);font-size:14px}
-  #done .res{background:var(--panel);border-radius:14px;padding:12px 16px;margin:18px auto 0;max-width:420px;text-align:left;font-size:16px;line-height:1.6}
+  #done .res{background:var(--panel);border-radius:14px;padding:12px 16px;margin:18px auto 0;max-width:520px;text-align:left;font-size:16px;line-height:1.6}
+  #done .res small{display:block;color:var(--muted);font-size:13px;line-height:1.4;margin-top:6px}
   #done .pts{margin-top:18px;font-size:16px;color:#ffb36b;font-weight:700}
   #done button{margin-top:28px;border:0;border-radius:18px;padding:18px 26px;font-size:20px;font-weight:800;background:var(--work);color:#000;width:100%;max-width:420px}
 </style>
@@ -165,16 +184,19 @@
   <h1>Warrior <span>Workout</span> Timer</h1>
   <p class="sub">Warrior MBS interval timer &middot; pick a day, review, start.</p>
 
-  <div id="weekWrap" class="hidden">
-    <div class="label">Week</div>
-    <select id="weekSel"></select>
+  <div class="label">Week</div>
+  <div class="weeks" id="weekSeg"></div>
+  <div class="wnote hidden" id="weekNote"></div>
+  <div id="modeWrap" class="hidden">
+    <div class="label">Equipment</div>
+    <div class="seg" id="modeSeg"></div>
   </div>
 
   <div class="label" id="weekLabel">Workout day</div>
   <div class="days" id="days"></div>
 
   <div id="levelWrap" class="hidden">
-    <div class="label">Run level</div>
+    <div class="label" id="levelLbl">Run level</div>
     <div class="seg" id="levelSeg"></div>
     <div class="effort" id="effortTxt"></div>
   </div>
@@ -184,7 +206,7 @@
     <button class="switch" id="vetSw" role="switch" aria-checked="false" aria-label="Veteran Challenge"></button>
   </div>
   <div class="row">
-    <div><div class="t">Voice &amp; beeps</div><div class="d">Spoken cues, &ldquo;Next&rdquo; preview and 3-2-1 countdown</div></div>
+    <div><div class="t">Voice &amp; beeps</div><div class="d">Spoken cues, tempo calls and 3-2-1 countdown</div></div>
     <button class="switch" id="soundSw" role="switch" aria-checked="true" aria-label="Voice and beeps"></button>
   </div>
 
@@ -193,6 +215,7 @@
     <div class="meta" id="totalMeta"></div>
   </div>
   <div class="intro" id="intro"></div>
+  <div class="hist hidden" id="history"></div>
 
   <ul class="steps" id="stepList"></ul>
 
@@ -226,7 +249,13 @@
   <div class="clock">
     <div id="clockLbl"></div>
     <div id="count">0:00</div>
-    <div class="sbar"><i id="sBar"></i></div>
+    <div class="logbox hidden" id="logBox">
+      <button id="logMinus" aria-label="Minus">&minus;</button>
+      <input id="logIn" type="number" min="0" inputmode="numeric" placeholder="0" aria-label="Your result">
+      <button id="logPlus" aria-label="Plus">+</button>
+    </div>
+    <div class="lrange hidden" id="logRange"></div>
+    <div class="sbar" id="sBarWrap"><i id="sBar"></i></div>
   </div>
 
   <div class="nextup" id="nextup"></div>
@@ -254,7 +283,7 @@
 <script>
 'use strict';
 /* =====================================================================
-   WORKOUT DATA  (source: "WARRIOR WORKOUTS | WEEK 1" document)
+   WORKOUT DATA  (source: the "WARRIOR WORKOUTS | WEEK 1-8" documents)
    To add a week: push another { week, title, days:[...] } onto WEEKS.
    Block types inside a day's `blocks` array:
      - a step:   { name, sec, kind:'work'|'rest', note, say, how, effort, cueAt, cue, record }
@@ -263,6 +292,13 @@
                  effort:true = show the selected run level's effort description
                  cueAt/cue  = extra spoken cue when that many seconds remain
                  record:true = log the time held (shown on the complete screen)
+                 tempo:{reps, phases:[[label,sec],...]} = time-under-tension pacing (voice calls each phase)
+                 rot:[{name,how,say},...] = rotating exercise inside a repeat (round r uses rot[(r-1) % n])
+                 noReady:true = no 5-sec get-ready before it (jog/sprint inside a run combo)
+                 openSay/openLbl = spoken / on-screen text for open-ended steps
+     - a log step: { kind:'log', logKey, unit:'reps'|'miles', ranges } = type in a number (tap Save)
+     - day.blocks may be a function(level) when the doc gives level-specific timings;
+       day.levels = per-level description (shows the level picker); week.resDays = resistance version.
      - a repeat: { repeat:N, section, roundWord, steps:[...], between:step, continuous }
                  `between` is inserted between rounds (not after the last).
                  continuous:true = only one 5-sec get-ready before the whole block
@@ -271,7 +307,7 @@
    A 5-second "Get ready" step is inserted automatically before every work step
    (see GET_READY_SEC / expandDay).
    ===================================================================== */
-const APP_VERSION = '2026-10-06.2';
+const APP_VERSION = '2026-10-07.1';
 const GET_READY_SEC = 5;
 const WORK = 'work', REST = 'rest', READY = 'ready';
 const W = (name, sec, note, extra) => Object.assign({ name, sec, kind: WORK, note: note || '' }, extra || {});
@@ -432,10 +468,212 @@ const HOWTO = {
     easier: '',
     demos: [] }
 };
+/* ---------- How-to cues for exercises added in Weeks 2-8 ---------- */
+Object.assign(HOWTO, {
+  'Hollow Body Hold': {
+    cues: ['Lie on your back, arms overhead, legs straight and together.',
+      'Press your lower back into the floor, then lift shoulders, arms and legs a few inches off the ground.',
+      'Hold a shallow \u201cbanana\u201d shape and keep breathing \u2014 don\u2019t let your lower back peel up.'],
+    easier: 'Doc mod: knees in (bend knees toward your chest), or keep your arms by your sides.',
+    demos: [['Watch demo', 'hollow body hold'], ['Knees-in (mod)', 'tuck hollow body hold']] },
+  'Hollow Body Crunch': {
+    cues: ['Start in the hollow position: lower back pressed down, arms overhead, legs straight and just off the floor.',
+      'Crunch: pull your knees in and bring your arms forward to meet them as your shoulders lift.',
+      'Stretch back out to the hollow position without resting on the floor; keep the lower back flat.'],
+    easier: 'Let your feet touch down between reps, or do regular crunches.',
+    demos: [['Watch demo', 'hollow body crunch'], ['Hollow body hold', 'hollow body hold']] },
+  'Slow Push-Up': {
+    cues: ['Normal push-up position: hands just wider than shoulders, body straight from head to heels.',
+      'Follow the voice: lower slowly for the \u201cdown\u201d time until your chest is about a fist from the floor.',
+      'Press back up just as slowly for the \u201cup\u201d time; brace abs and squeeze glutes the whole way.',
+      'If you have to stop, hold the position (midpoint or top) instead of lying down.'],
+    easier: 'Same tempo from your knees (doc mod: knee push-ups).',
+    demos: [['Watch demo', 'slow tempo push ups'], ['Knee push-ups', 'knee push ups']] },
+  'Slow Pull-Up': {
+    cues: ['Start at the top with your chin over the bar (jump or step up to get there).',
+      'Lower for 15 seconds, smooth and controlled, to nearly straight arms.',
+      'Pull back up for 15 seconds \u2014 no swinging, no resting.'],
+    easier: 'A resistance band or a box under your feet takes some of your weight.',
+    demos: [['Watch demo', 'slow negative pull up']] },
+  'Four Way Lunges': {
+    cues: ['Stand tall, hands on hips. Lunge forward, then push back to standing.',
+      'Lunge out to the side: sit back into that hip with the other leg straight, then push back.',
+      'Reverse lunge: step back until both knees are about 90\u00b0, then return. Then lunge to the other side.',
+      'Repeat the four directions and switch legs; front knee stays over the ankle, chest up.'],
+    easier: 'Shorter steps and shallower lunges; hold a wall or chair for balance.',
+    demos: [['Watch demo', '4 way lunge']] },
+  'Burpees': {
+    cues: ['From standing, squat down and put your hands on the floor.',
+      'Jump or step your feet back to a plank (add a push-up if you can).',
+      'Jump or step your feet back to your hands, then stand up (or jump) with arms overhead.',
+      'Pick a pace you can keep for the whole interval.'],
+    easier: 'Doc mod: push-up / stand-up \u2014 step back and forward instead of jumping, skip the jump, or go slowly.',
+    demos: [['Watch demo', 'burpees'], ['No-jump burpee', 'no jump burpee modification']] },
+  'Sprint': {
+    cues: ['Run hard at the effort shown (80\u201390% = fast but controlled, not all-out).',
+      'Drive your arms, stay tall, quick steps landing under your hips.',
+      'Build into the first few sprints, then go straight into the jog or walk.'],
+    easier: 'Choose Beginner (shorter, 80% sprints); a fast jog is fine while you build up.',
+    demos: [['Watch demo', 'sprinting form']] },
+  'Air Squats': {
+    cues: ['Feet shoulder-width, toes slightly out, arms forward for balance.',
+      'Sit your hips back and down until your thighs are about parallel (90\u00b0), chest up.',
+      'Knees track over your toes (don\u2019t let them cave in); push through your heels to stand.'],
+    easier: 'Squat down to a chair or bench and stand back up; go only as low as is comfortable.',
+    demos: [['Watch demo', 'bodyweight squat'], ['Chair squat', 'chair squat']] },
+  'Weighted Squats': {
+    cues: ['Hold dumbbells at your sides or shoulders \u2014 or stand on a band holding the handles at your shoulders.',
+      'Feet shoulder-width; sit your hips back and down to about parallel, chest up.',
+      'Drive through your heels to stand; knees track over your toes.'],
+    easier: 'Use a lighter weight or band, or do bodyweight air squats.',
+    demos: [['Watch demo', 'dumbbell squat'], ['Band squat', 'resistance band squat']] },
+  'Explosive Jump Squats': {
+    cues: ['Squat down to about parallel with your arms back.',
+      'Explode up into a jump, swinging your arms up.',
+      'Land softly on the balls of your feet with knees bent and go straight into the next squat.'],
+    easier: 'Doc mod: air squats (no jump).',
+    demos: [['Watch demo', 'jump squats'], ['Air squats (mod)', 'bodyweight squat']] },
+  'Russian Twist': {
+    cues: ['Sit with knees bent and lean back into a V-shape with a straight back (feet down or lifted).',
+      'Clasp your hands (or hold a weight) and rotate side to side, touching the floor beside each hip.',
+      'Turn from your ribs, not just your arms, and keep breathing.'],
+    easier: 'Keep your feet on the floor and lean back less.',
+    demos: [['Watch demo', 'russian twist']] },
+  'Windshield Wipers': {
+    cues: ['Lie on your back with arms out in a T, palms down; legs straight up (or knees bent 90\u00b0).',
+      'Keeping both shoulders on the floor, slowly lower your legs to one side.',
+      'Bring them back through the middle and over to the other side \u2014 slow and controlled.'],
+    easier: 'Bend your knees and only go part of the way down.',
+    demos: [['Watch demo', 'lying windshield wipers'], ['Bent-knee version', 'bent knee windshield wipers']] },
+  'Walking Lunges': {
+    cues: ['Stand tall and step forward into a lunge: both knees about 90\u00b0, back knee just above the floor.',
+      'Front knee stays over the ankle; chest up.',
+      'Push through the front heel and bring the back foot forward into the next lunge.'],
+    easier: 'Take shorter steps and shallower lunges, or do stationary lunges holding a wall.',
+    demos: [['Watch demo', 'walking lunges']] },
+  'Resistance Rows': {
+    cues: ['Dumbbells: hinge forward at the hips with a flat back and soft knees, weights hanging under your shoulders. Band: anchor it at chest height (or stand on it and hinge forward).',
+      'Pull your elbows back toward your hips and squeeze your shoulder blades together.',
+      'Lower slowly; keep your back flat and neck neutral.'],
+    easier: 'Lighter weight or band; or support one hand on a bench and row one arm at a time.',
+    demos: [['Watch demo', 'dumbbell bent over row'], ['Band row', 'resistance band row']] },
+  'Bulgarian Split Squat': {
+    cues: ['Stand about 2 feet in front of a bench or chair and rest the top of your back foot on it.',
+      'Lower straight down until your front thigh is about parallel; front knee over the ankle, chest up.',
+      'Push through the front heel to stand. Work one leg, then the other \u2014 the timer tells you when to switch.'],
+    easier: 'Doc mod: air squats; or a regular split squat with the back foot on the floor.',
+    demos: [['Watch demo', 'bulgarian split squat'], ['Air squats (mod)', 'bodyweight squat']] },
+  'High Knees': {
+    cues: ['Run in place, driving each knee up to hip height.',
+      'Stay on the balls of your feet, pump your arms and stand tall.',
+      'Fast and high \u2014 keep it going for the whole interval.'],
+    easier: 'March in place with high knees (no hop), or bring the knees up a bit less.',
+    demos: [['Watch demo', 'high knees exercise']] },
+  'Plank Crunches': {
+    cues: ['Start in a plank (high or forearm) with your body straight.',
+      'Drive one knee toward the same-side elbow (or across to the opposite elbow), then step it back.',
+      'Alternate sides, keeping your hips low and level.'],
+    easier: 'Doc mod: hold an elbow (forearm) plank.',
+    demos: [['Watch demo', 'plank knee to elbow crunch'], ['Elbow plank (mod)', 'forearm plank']] },
+  'Plank Supermans': {
+    cues: ['Start in a high plank, hands under your shoulders.',
+      'Reach one arm straight out in front (add the opposite leg if you can) and hold \u2014 Week 7 says 5 seconds each.',
+      'Return and switch sides; keep your hips square and don\u2019t rock.'],
+    easier: 'Doc mods: hold a regular plank, or do floor supermans.',
+    demos: [['Watch demo', 'plank superman'], ['Bird dog (easier)', 'bird dog exercise']] },
+  'Hanging Leg Raises': {
+    cues: ['Hang from a bar with straight arms and your shoulders pulled down.',
+      'Without swinging, raise your legs (straight or slightly bent) until your hips are at 90\u00b0.',
+      'Lower slowly under control.'],
+    easier: 'Doc mod: knee raises \u2014 bring your knees up toward your chest; or lying leg raises on the floor.',
+    demos: [['Watch demo', 'hanging leg raise'], ['Hanging knee raise (mod)', 'hanging knee raise']] },
+  'Pull-Ups': {
+    cues: ['Hands on the bar a little wider than your shoulders, palms facing away (a chin-up grip is OK).',
+      'From a full hang, pull until your chin clears the bar, then lower under control.',
+      'When you can\u2019t do another rep, hold where you are (top or midpoint) until time is up \u2014 don\u2019t stop!'],
+    easier: 'Isometric hold: jump or step up to the top or midpoint and hold; or use a resistance band.',
+    demos: [['Watch demo', 'pull ups'], ['Isometric hold (mod)', 'pull up isometric hold']] },
+  'Russian Routine': {
+    cues: ['The workout doc doesn\u2019t describe this move \u2014 follow the Warrior program video (Coach Jeremy) for the exact sequence.',
+      'Use light bands or dumbbells, keep your core braced and move with control for the whole interval.',
+      'Breathe steadily and stop if your form breaks down.'],
+    easier: 'Go lighter, or bodyweight only.',
+    demos: [['Search YouTube', 'russian routine dumbbell workout']] },
+  'Side Plank with Twist': {
+    cues: ['Side plank: forearm under your shoulder, feet stacked (or staggered), body in a straight line.',
+      'Reach your top arm to the ceiling, then thread it under your body, rotating your chest toward the floor.',
+      'Rotate back open and keep your hips lifted. Right side, then left side.'],
+    easier: 'Drop your bottom knee to the floor, or hold a plain side plank without the twist.',
+    demos: [['Watch demo', 'side plank with twist'], ['Plain side plank', 'side plank']] },
+  'Pectoral Flys': {
+    cues: ['Lie on a bench (or the floor) with dumbbells above your chest, palms facing, elbows slightly bent. Bands: anchor them behind you at chest height.',
+      'Open your arms wide in an arc until you feel a stretch across your chest (elbows stay soft).',
+      'Squeeze your chest to bring them back together over your chest.'],
+    easier: 'Lighter weights and a smaller range; on the floor your elbows stop you going too deep.',
+    demos: [['Watch demo', 'dumbbell chest fly'], ['Band fly', 'resistance band chest fly']] },
+  'Bicep Curls': {
+    cues: ['Stand tall with dumbbells (or band handles, standing on the band) at your sides, palms forward.',
+      'Keep your elbows pinned to your sides and curl the weight up to your shoulders.',
+      'Lower slowly \u2014 no swinging with your back.'],
+    easier: 'Lighter weight or band; alternate arms.',
+    demos: [['Watch demo', 'dumbbell bicep curl'], ['Band curl', 'resistance band bicep curl']] },
+  'Shoulder Press': {
+    cues: ['Dumbbells (or band handles, standing on the band) at shoulder height, palms forward.',
+      'Brace your abs and press straight overhead until your arms are straight.',
+      'Lower back to shoulder height with control; don\u2019t arch your lower back.'],
+    easier: 'Sit down, go lighter, or press one arm at a time.',
+    demos: [['Watch demo', 'dumbbell shoulder press'], ['Band press', 'resistance band shoulder press']] },
+  'Overhead Triceps': {
+    cues: ['Hold one dumbbell with both hands overhead (or a band anchored under your foot), arms straight \u2014 standing or seated on a bench.',
+      'Keep your elbows pointing up and close to your head as you lower the weight behind your head.',
+      'Straighten your elbows to press it back up; only your forearms move.'],
+    easier: 'Use a lighter weight, or do bench dips with bent knees.',
+    demos: [['Watch demo', 'overhead dumbbell tricep extension'], ['Band version', 'resistance band overhead tricep extension']] },
+  'Dip Glute Blasters': {
+    cues: ['The workout doc doesn\u2019t spell out this move \u2014 check the Warrior program video for the exact setup.',
+      'Doc cues: squeeze your glutes hard and hold for 2 seconds at the top of every rep.',
+      'Aim for 10\u201315 controlled reps in the interval.'],
+    easier: 'Doc mod (Week 6): regular dips.',
+    demos: [['Search YouTube', 'glute blaster exercise']] },
+  'Mile Run': {
+    cues: ['Use a measured mile: a track (4 laps), a GPS app or a treadmill.',
+      'Start steady \u2014 don\u2019t sprint the first lap \u2014 and finish strong.',
+      'Tap Done the moment you finish; the timer saves your time.'],
+    easier: 'Walking breaks are fine; just record your time honestly.',
+    demos: [['Watch demo', 'mile run pacing']] },
+  'Distance Run': {
+    cues: ['Find a level surface, start the AllTrails app (or your GPS watch) and go.',
+      'Pace yourself \u2014 don\u2019t blow it all in the first 10 minutes.',
+      'On an elliptical or bike, use its distance reading. Log your distance at the end.'],
+    easier: 'Walk-run is fine \u2014 keep moving for the full 30 minutes.',
+    demos: [['Watch demo', 'running pacing tips']] }
+});
 /* ---------- Looping exercise animations (local files in img/, see img/CREDITS.txt) ----------
    Only added where the source clearly shows the right exercise. */
 const FEDB = { credit: 'Images: free-exercise-db (public domain)', href: 'https://github.com/yuhonas/free-exercise-db' };
 const ANIM = {
+  'Air Squats':           Object.assign({ frames: ['img/air-squat-0.jpg', 'img/air-squat-1.jpg'] }, FEDB),
+  'Weighted Squats':      Object.assign({ frames: ['img/db-squat-0.jpg', 'img/db-squat-1.jpg'] }, FEDB),
+  'Explosive Jump Squats': Object.assign({ frames: ['img/jump-squat-0.jpg', 'img/jump-squat-1.jpg'] }, FEDB),
+  'Russian Twist':        Object.assign({ frames: ['img/russian-twist-0.jpg', 'img/russian-twist-1.jpg'] }, FEDB),
+  'Bicep Curls':          Object.assign({ frames: ['img/bicep-curl-0.jpg', 'img/bicep-curl-1.jpg'] }, FEDB),
+  'Shoulder Press':       Object.assign({ frames: ['img/shoulder-press-0.jpg', 'img/shoulder-press-1.jpg'] }, FEDB),
+  'Overhead Triceps':     Object.assign({ frames: ['img/overhead-triceps-0.jpg', 'img/overhead-triceps-1.jpg'] }, FEDB),
+  'Pectoral Flys':        Object.assign({ frames: ['img/pec-fly-0.jpg', 'img/pec-fly-1.jpg'] }, FEDB),
+  'Bulgarian Split Squat': Object.assign({ frames: ['img/bulgarian-split-squat-0.jpg', 'img/bulgarian-split-squat-1.jpg'] }, FEDB),
+  'Hanging Leg Raises':   Object.assign({ frames: ['img/hanging-leg-raise-0.jpg', 'img/hanging-leg-raise-1.jpg'] }, FEDB),
+  'Resistance Rows':      Object.assign({ frames: ['img/db-row-0.jpg', 'img/db-row-1.jpg'] }, FEDB),
+  'Walking Lunges':       Object.assign({ frames: ['img/walking-lunge-0.jpg', 'img/walking-lunge-1.jpg'] }, FEDB),
+  'Pull-Ups':             Object.assign({ frames: ['img/pullups-0.jpg', 'img/pullups-1.jpg'] }, FEDB),
+  'Slow Pull-Up':         Object.assign({ frames: ['img/pullups-0.jpg', 'img/pullups-1.jpg'] }, FEDB),
+  'Slow Push-Up':         Object.assign({ frames: ['img/pushups-0.jpg', 'img/pushups-1.jpg'] }, FEDB),
+  'Sprint':               Object.assign({ frames: ['img/running-0.jpg', 'img/running-1.jpg'] }, FEDB),
+  'Mile Run':             Object.assign({ frames: ['img/running-0.jpg', 'img/running-1.jpg'] }, FEDB),
+  'Distance Run':         Object.assign({ frames: ['img/running-0.jpg', 'img/running-1.jpg'] }, FEDB),
+  'Burpees':    { frames: ['img/burpees.gif'], credit: 'Animation: Wensceslao, CC BY-SA 4.0, via Wikimedia Commons',
+                  href: 'https://commons.wikimedia.org/wiki/File:Burpees.gif' },
+  'High Knees': { frames: ['img/high-knees.gif'], credit: 'Animation: Wensceslao, CC BY-SA 4.0, via Wikimedia Commons',
+                  href: 'https://commons.wikimedia.org/wiki/File:High_knees.gif' },
   'Push Ups':             Object.assign({ frames: ['img/pushups-0.jpg', 'img/pushups-1.jpg'] }, FEDB),
   'Forearm Plank':        Object.assign({ frames: ['img/plank-0.jpg'] }, FEDB),
   'Glute Bridges':        Object.assign({ frames: ['img/glute-bridge-0.jpg', 'img/glute-bridge-1.jpg'] }, FEDB),
@@ -582,6 +820,622 @@ const WEEKS = [
 ];
 const LEVELS = [['beginner', 'Beginner'], ['intermediate', 'Intermediate'], ['advanced', 'Advanced']];
 
+/* =====================================================================
+   WEEKS 2-8  (source: the WEEK 2-8 workout PDFs in the Warrior MBS hub)
+   blocks may be a function(level) when the doc gives level-specific timings.
+   ===================================================================== */
+const LOG = 'log';
+const lv = (lvl, a, i, b) => lvl === 'advanced' ? a : lvl === 'intermediate' ? i : b;
+const cut = (lvl, sec, iCut, bCut) => Math.max(5, sec - lv(lvl, 0, iCut, bCut));
+const cutLevels = (i, b) => ({
+  advanced: 'Advanced: exercise times as listed in the doc.',
+  intermediate: `Intermediate: ${i} seconds less on each exercise (rests unchanged).`,
+  beginner: `Beginner: ${b} seconds less on each exercise (rests unchanged).` });
+const COOL = (note, sec) => COOLDOWN(sec || 300, note || 'Cool down with stretch or walk. Breathe deeply and slowly.', (sec || 300) === 300 ? '5-minute cooldown' : 'Cooldown');
+const STRETCH3 = { name: 'Stretch', sec: 180, kind: REST, section: 'Stretch', how: 'Stretch',
+  note: 'Hamstrings · Quad pulls · Hands above head REACH (lengthen your body). Make sure to diaphragm breathe.' };
+const COOLWALK2 = () => COOLDOWN(120, '', 'Cooldown walk', 'Cooldown walk');
+const TUT = (name, how, reps, up, hold, down, sec, say) => W(name, sec || reps * (up + hold + down),
+  `${reps} slow reps \u00b7 ${up}s up, ${hold}s pause, ${down}s down (${up + hold + down}s per rep)`,
+  { how, say: say || name, tempo: { reps, phases: [['Up', up], ['Hold', hold], ['Down', down]] } });
+const ONE_MIN_PU = (sec, note) => W('One-Minute Push-Up', sec, note || `ONE slow push-up: ${sec / 2}s down, ${sec / 2}s up without a break`,
+  { how: 'Slow Push-Up', say: 'one minute push up', tempo: { reps: 1, phases: [['Down', sec / 2], ['Up', sec / 2]] } });
+const LOGSTEP = (name, key, unit, extra) => Object.assign({ name, sec: null, kind: LOG, logKey: key || null, unit: unit || 'reps', note: '' }, extra || {});
+const BURN = (name, how, say) => [
+  W(name + ' \u2014 Burn Out', null, 'Go till failure, then tap Done. Post your total to your triad.',
+    { how, say: say + ' burn out', section: 'Burn Out', openLbl: 'Go till failure \u2014 tap Done', openSay: 'Go till failure, then tap Done' }),
+  LOGSTEP('Log your ' + name + ' total', null, 'reps', { section: 'Burn Out', logLabel: name + ' burn out', say: 'your ' + say + ' total' })
+];
+const ROT = (name, how, say) => ({ name, how: how || name, say: say || name });
+const RX = {   // rotating exercises used in the run-combo days
+  hbc: ROT('Hollow Body Crunch'), pu: ROT('Pushups', 'Push Ups', 'push ups'), sq: ROT('Air Squats'),
+  mc: ROT('Mountain Climbers'), hh: ROT('Hollow Body Hold'), hk: ROT('High Knees'),
+  bur: ROT('Burpees'), jj: ROT('Explosive Jumping Jacks'), ep: ROT('Elbow Planks', 'Forearm Plank', 'elbow plank'),
+  gb: ROT('Glute Bridges'), fk: ROT('Flutter Kicks'), ps: ROT('Plank Supermans', 'Plank Supermans', 'plank supermans'),
+  hkl: ROT('High Knee Lunge', 'High Knee Walking Lunge', 'high knee lunge')
+};
+/* Run combo: each set = rotating exercise -> 50% jog -> sprint -> walk (rest).  Arrays are [advanced, intermediate, beginner]. */
+function runComboLevels(c) {
+  const t = (k, i) => c[k][i];
+  const one = (lbl, i) => `${lbl}: ${c.sets} sets \u00b7 ${t('ex', i)}s ${c.rot.map(r => r.name).join(' / ')} (rotating) \u00b7 ${t('jog', i)}s 50% jog \u00b7 ${t('sprint', i)}s sprint (${t('pct', i)}) \u00b7 walk ${t('walk', i)}s`;
+  return { advanced: one('Advanced', 0), intermediate: one('Intermediate', 1), beginner: one('Beginner', 2) };
+}
+function runComboBlock(lvl, c) {
+  const g = k => lv(lvl, c[k][0], c[k][1], c[k][2]);
+  return { repeat: c.sets, section: 'Run Combo', roundWord: 'Set', steps: [
+    W('Rotating exercise', g('ex'), 'Rotating exercise: ' + c.rot.map(r => r.name).join(' / '), { rot: c.rot }),
+    W('50% jog', g('jog'), '50% effort', { how: 'Jog', say: 'jog', noReady: true }),
+    W('Sprint', g('sprint'), g('pct') + ' effort', { how: 'Sprint', say: 'sprint', noReady: true }),
+    R(g('walk'), 'Walk', 'This is your rest')
+  ] };
+}
+function runComboDay(label, c, extraIntro) {
+  return { label, name: 'Warrior RUN COMBO Day', type: 'run', levels: runComboLevels(c),
+    intro: extraIntro || [],
+    blocks: lvl => [WARMUP, runComboBlock(lvl, c), COOL('Cool down. Stretch as needed. Drink lots of water.')] };
+}
+/* 15-set walk + 80% sprint interval run (Week 6 resistance Day 4, Week 7 Day 4) */
+const INTERVAL_15 = label => ({
+  label, name: 'Warrior Interval Run Day', type: 'run',
+  intro: ['15 sets interval run (see video explanation).'],
+  levels: { advanced: 'Advanced: set = 35 sec walking + 25 sec high intensity (80% effort)',
+    intermediate: 'Intermediate: set = 40 sec walking + 20 sec high intensity (80% effort)',
+    beginner: 'Beginner: set = 40 sec walking + 15 sec high intensity (80% effort)' },
+  blocks: lvl => [WARMUP,
+    { repeat: 15, section: 'Interval Run', roundWord: 'Set', continuous: true, steps: [
+      R(lv(lvl, 35, 40, 40), 'Walk', 'Low intensity (walking)'),
+      W('Sprint', lv(lvl, 25, 20, 15), 'High intensity (80% effort)', { how: 'Sprint', say: 'sprint' }) ] },
+    COOLWALK2(), STRETCH3]
+});
+/* Light pre-test combo day (Week 5 Day 2, both versions) */
+const W5_LIGHT = {
+  label: 'Day 2', name: 'LIGHT Pre-Test COMBO Day', type: 'combo',
+  intro: ['This day is purposefully meant to be a bit lighter so you will be fresh for the Mid-Program Re-Test on Day 3.'],
+  blocks: [WARMUP,
+    W('Pushups', 30, '', { how: 'Push Ups', say: 'push ups', section: 'Combo' }),
+    W('5-minute run', 300, '40% effort \u2014 slow jog', { how: 'Jog', say: 'five minute run, slow jog', section: 'Combo' }),
+    R(60, 'Rest', '', { section: 'Combo' }),
+    W('Plank Supermans', 30, 'Mod: plank', { section: 'Combo' }),
+    W('6-minute run', 360, '40% \u2014 slow jog', { how: 'Jog', say: 'six minute run, slow jog', section: 'Combo' }),
+    R(60, 'Rest', '', { section: 'Combo' }),
+    W('Hollow Body Crunches', 30, '', { how: 'Hollow Body Crunch', section: 'Combo' }),
+    W('7-minute run', 420, '50% \u2014 average jog', { how: 'Jog', say: 'seven minute run, average jog', section: 'Combo' }),
+    COOLDOWN(300, '', '5-minute cooldown')]
+};
+/* Assessment (Week 5 Day 3 mid-program re-test, Week 8 final re-test) - test list/order/ranges from
+   "Warrior Initial Testing & Scorecard". */
+const TESTS = [
+  { key: 'pushups', name: 'Push-ups', how: 'Push Ups', std: 'Chest touches ground to full arm extension', ranges: '1-12 beginner \u00b7 12-18 intermediate \u00b7 18+ advanced' },
+  { key: 'squats', name: 'Squats', how: 'Air Squats', std: '90 degree / butt to seat', ranges: '1-12 beginner \u00b7 12-24 intermediate \u00b7 25+ advanced' },
+  { key: 'pullups', name: 'Pull-ups', how: 'Chin Ups or Pull-Ups', std: 'Chin above bar to near full arm extension', ranges: '1-5 beginner \u00b7 5-10 intermediate \u00b7 11+ advanced' },
+  { key: 'situps', name: 'Sit-ups', how: 'Sit-ups', std: 'Shoulder blades on ground / elbows touch knees', ranges: '1-10 beginner \u00b7 11-20 intermediate \u00b7 21+ advanced' }
+];
+const MILE_RANGES = '15:00+ beginner \u00b7 10:00-14:59 intermediate \u00b7 under 10:00 advanced';
+function assessmentDay(label, name, intro) {
+  const blocks = [WARMUP];
+  TESTS.forEach(t => {
+    blocks.push(W('Test: ' + t.name, 30, t.std + '. Count every good rep.', { how: t.how, say: t.name, section: 'Testing', ranges: t.ranges }));
+    blocks.push(LOGSTEP('Log your ' + t.name, t.key, 'reps', { section: 'Testing', ranges: t.ranges, logLabel: t.name, say: 'your number of ' + t.name }));
+    blocks.push(R(120, 'Rest', 'Take at least two minutes between each exercise (pause if you need longer).', { section: 'Testing' }));
+  });
+  blocks.push(W('1-Mile Run', null, 'Run one mile for time. Tap Done the moment you finish.',
+    { how: 'Mile Run', say: 'one mile run', section: 'Testing', record: true, recordKey: 'mileSec', recordLabel: '1-mile run',
+      ranges: MILE_RANGES, openLbl: 'Running \u2014 tap Done at the mile', openSay: 'Run one mile, then tap Done' }));
+  return { label, name, type: 'assessment', assessment: name, intro, blocks };
+}
+
+WEEKS.push(
+  /* ------------------------------ WEEK 2 ------------------------------ */
+  {
+    week: 2, title: 'Week 2',
+    days: [
+      {
+        label: 'Day 1', name: 'Warrior Muscle Day', type: 'muscle',
+        intro: ['Modifications for ANY of these: see videos or contact coach.'],
+        vetDesc: 'One-minute push-up: 30 sec down, 30 sec up without a break',
+        blocks: [WARMUP,
+          { repeat: 3, section: 'Circuits', roundWord: 'Circuit', between: R(90, 'Rest between circuits', 'Rest 90 seconds, then repeat.'),
+            steps: [W('Push Ups', 30, 'Focus on form and steady rhythm'), R(30),
+              W('Elbow Planks', 40, '', { how: 'Forearm Plank', say: 'elbow plank' }), R(30),
+              W('Wall Sits', 60, '90 degree angle at knee', { how: 'Wall Sit', say: 'wall sit' }), R(30),
+              W('Glute Bridges', 30), R(30),
+              W('High Knee Walking Lunge', 30), R(30),
+              W('Hollow Body Crunches', 30, '', { how: 'Hollow Body Crunch' })] },
+          { veteran: true, repeat: 1, section: 'Veteran Challenge', steps: [ONE_MIN_PU(60, 'Perform a one minute push-up: 30 sec down, 30 sec up without a break')] },
+          COOLDOWN(300, '', '5-minute cooldown')]
+      },
+      {
+        label: 'Day 2', name: 'Warrior Run Day', type: 'run',
+        intro: ['22 sets interval run (see video explanation). Each set = 10 sec run + 30 sec walk.',
+          'One 5-sec get-ready before the first run; the 22 run/walk sets then flow continuously.'],
+        levels: {
+          advanced: 'Advanced: 10 sec High Intensity (80% effort) + 30 sec Low intensity (walking)',
+          intermediate: 'Intermediate: 10 sec Medium Intensity (60% effort) + 30 sec Low intensity (walking)',
+          beginner: 'Beginner: 10 sec Medium to Low Intensity (50%) + 30 sec Low intensity (walking)' },
+        effortShort: { advanced: 'High Intensity (80% effort)', intermediate: 'Medium Intensity (60% effort)', beginner: 'Medium to Low Intensity (50%)' },
+        vetDesc: '60 sec mountain climbers, 45 sec break, 60 sec jump squats',
+        blocks: [WARMUP,
+          { repeat: 22, section: 'Interval Run', roundWord: 'Round', continuous: true,
+            steps: [W('Run', 10, '', { effort: true, how: 'Run' }), R(30, 'Walk', 'Low intensity (walking)')] },
+          COOLWALK2(),
+          { veteran: true, repeat: 1, section: 'Veteran Challenge', steps: [
+            W('Mountain Climbers', 60), R(45, 'Break'), W('Jump Squats', 60, '', { how: 'Explosive Jump Squats', say: 'jump squats' })] },
+          STRETCH3]
+      },
+      {
+        label: 'Day 3', name: 'Warrior Muscle Day', type: 'muscle',
+        intro: ['3 circuits (doc estimates ~20 minutes).'],
+        vetDesc: '30-second pull-up: 15 sec down, 15 sec up without a break',
+        blocks: [WARMUP,
+          { repeat: 3, section: 'Circuits', roundWord: 'Circuit', between: R(120, 'Rest between circuits', '2 minutes rest, then repeat.'),
+            steps: [W('Chin Ups or Pull-Ups', 20, 'Mod: Isometric hold at top point', { say: 'chin ups or pull ups' }), R(30),
+              W('Four Way Lunges', 60), R(30),
+              W('Bench Dips', 30), R(30),
+              W('Mountain Climbers', 20), R(30),
+              W('Explosive Jumping Jacks', 30)] },
+          { veteran: true, repeat: 1, section: 'Veteran Challenge', steps: [
+            W('30-Second Pull-Up', 30, 'Perform a 30 second pull-up: 15 sec down, 15 sec up without a break',
+              { how: 'Slow Pull-Up', say: 'thirty second pull up', tempo: { reps: 1, phases: [['Down', 15], ['Up', 15]] } })] },
+          COOLDOWN(300, '', '5-minute cooldown')]
+      },
+      {
+        label: 'Day 4', name: 'Warrior Run Day', type: 'run',
+        levelsSame: 'Day 4 has one plan for every level: 5, 6 and 7 minute runs, all at 50% (average jog).',
+        vetDesc: '120 second wall sit',
+        blocks: [WARMUP,
+          W('5-minute run', 300, '50% effort \u2014 average jog', { how: 'Jog', say: 'five minute run', section: 'Runs' }),
+          R(60, 'Rest', '', { section: 'Runs' }),
+          W('6-minute run', 360, '50% \u2014 average jog', { how: 'Jog', say: 'six minute run', section: 'Runs' }),
+          R(60, 'Rest', '', { section: 'Runs' }),
+          W('7-minute run', 420, '50% \u2014 average jog', { how: 'Jog', say: 'seven minute run', section: 'Runs' }),
+          { veteran: true, repeat: 1, section: 'Veteran Challenge', steps: [W('Wall Sit', 120, 'Perform a 120 second wall sit')] },
+          COOLDOWN(300, '', '5-minute cooldown')]
+      },
+      {
+        label: 'Day 5', name: 'Warrior COMBO Day', type: 'combo',
+        intro: ['End of Week 2 \u2014 did you get all 10 points?'],
+        vetDesc: 'Burpee Killer: how many burpees can you do in 100 seconds?',
+        blocks: [WARMUP,
+          { repeat: 3, section: 'Interval Cycles', roundWord: 'Cycle', between: R(120, 'Rest between cycles', 'Rest 2 minutes, then repeat.'),
+            steps: [W('Push Ups', 20, 'Mod: knee push-ups'), R(30),
+              W('Sit-ups', 20, '', { say: 'sit ups' }), R(30),
+              W('Burpees', 20, 'Mod: push up / stand up'), R(30),
+              W('Bench Dips', 20), R(30),
+              W('Hollow Body Hold', 20), R(30),
+              W('Sprint / Run', 20, '80% effort \u2014 keep the intensity!', { how: 'Sprint', say: 'sprint' })] },
+          { veteran: true, repeat: 1, section: 'Veteran Challenge', steps: [
+            W('Burpee Killer', 100, 'How many burpees can you do in 100 seconds?', { how: 'Burpees', say: 'burpee killer' }),
+            LOGSTEP('Log your burpees', null, 'reps', { logLabel: 'Burpee Killer (100 s)', say: 'your burpee count' })] },
+          COOLDOWN(300, '', '5-minute cooldown')]
+      }
+    ],
+    resDays: [
+      {
+        label: 'Day 1', name: 'Warrior Muscle Circuit', type: 'muscle',
+        intro: ['Circuit 3x through. For additional modifications on exercises, contact Coach Jeremy.'],
+        blocks: [WARMUP,
+          { repeat: 3, section: 'Circuit', roundWord: 'Round', between: R(120, 'Rest between rounds', 'Rest 2 minutes, then back to top.'),
+            steps: [W('Russian Routine', 60, 'Bands or dumbbells'), R(30),
+              W('Side Plank with Twist \u2014 Right', 30, '', { how: 'Side Plank with Twist', say: 'right side plank with twist' }),
+              W('Side Plank with Twist \u2014 Left', 30, '', { how: 'Side Plank with Twist', say: 'left side plank with twist' }), R(30),
+              W('Pectoral Flys', 60, 'Bands or dumbbells on bench'), R(30),
+              W('Bicep Curls', 60, 'Bands or dumbbells'), R(30),
+              W('Dip Glute Blasters', 45, '2-second hold on glute squeeze \u2014 should do 10-15 reps')] },
+          COOL()]
+      },
+      null,   // Day 2 = same as bodyweight Day 2 (filled in below)
+      {
+        label: 'Day 3', name: 'Warrior MUSCLE Day', type: 'muscle',
+        intro: ['Circuit 4x through. Times are for the Advanced group; pick your level above.'],
+        levels: cutLevels(10, 15),
+        blocks: lvl => [WARMUP,
+          { repeat: 4, section: 'Circuit', roundWord: 'Round', between: R(90, 'Rest between rounds', 'Rest 90 secs, then back to top.'),
+            steps: [W('Squats', cut(lvl, 45, 10, 15), 'Bands or dumbbells', { how: 'Weighted Squats' }), R(45),
+              W('Bicep Curls', cut(lvl, 45, 10, 15), 'Bands or dumbbells'), R(45),
+              W('Pull-Ups', cut(lvl, 25, 10, 15), 'Iso-holds at failure \u2014 don\u2019t STOP', { say: 'pull ups' }), R(45),
+              W('Shoulder Press', cut(lvl, 40, 10, 15), 'Bands or dumbbells')] },
+          R(90, 'Rest', 'Rest 90 secs before the finisher.', { section: 'Finisher' }),
+          W('Hollow Body Hold', 60, '60 second hollow body hold. Can you do it?', { section: 'Finisher' }),
+          COOL('Stretch as needed. Drink lots of water.')]
+      },
+      null,   // Day 4 = same as bodyweight Day 4
+      {
+        label: 'Day 5', name: 'Warrior MUSCLE Time Under Tension (TUT)', type: 'muscle',
+        intro: ['Perform 4 reps of each exercise in a slow cadence: 5 seconds up, pause 2 seconds, 5 seconds down (12 seconds per rep). The voice calls each phase.',
+          'Pro tip (coach): \u201cI set the interval timer to 50 seconds to cover this, giving you a couple extra seconds.\u201d',
+          'If you get exhausted, pause briefly and then get right back to it.'],
+        blocks: [WARMUP,
+          { repeat: 3, section: 'TUT Circuit', roundWord: 'Set', between: R(120, 'Rest between sets', 'Rest 2 minutes, then back to top.'),
+            steps: [TUT('Air Squats (bands or dumbbells)', 'Weighted Squats', 4, 5, 2, 5, 50, 'air squats'), R(40),
+              TUT('Pushups', 'Slow Push-Up', 4, 5, 2, 5, 50, 'push ups'), R(40),
+              TUT('Hollow Body Crunch', 'Hollow Body Crunch', 4, 5, 2, 5, 50), R(40),
+              TUT('Supermans', 'Supermans', 4, 5, 2, 5, 50), R(40),
+              TUT('Bench Dips', 'Bench Dips', 4, 5, 2, 5, 50)] },
+          COOL()]
+      }
+    ]
+  },
+  /* ------------------------------ WEEK 3 ------------------------------ */
+  {
+    week: 3, title: 'Week 3',
+    note: 'If injured where walking is the only option, do 12,000 steps in a day using a step tracker and upload a Sweaty Selfie while walking.',
+    days: [
+      {
+        label: 'Day 1', name: 'Warrior Muscle Circuit', type: 'muscle',
+        blocks: [WARMUP,
+          { repeat: 4, section: 'Circuit', roundWord: 'Round', between: R(120, 'Rest between rounds', 'Rest 2 minutes, then back to top.'),
+            steps: [W('Four Way Lunges', 60), R(45),
+              W('Hollow Body Hold', 60, 'Mod: knees in'), R(45),
+              ONE_MIN_PU(60, 'One minute push-up (mod: one minute knee push-up)'), R(45),
+              W('Bulgarian Split Squat', 60, '30 secs each leg (mod: air squat)', { cueAt: 30, cue: 'Switch legs' })] },
+          COOL()]
+      },
+      runComboDay('Day 2', { sets: 12, rot: [RX.hbc, RX.pu, RX.sq], ex: [15, 15, 15], jog: [30, 30, 30], sprint: [15, 15, 10],
+        pct: ['80-90%', '80-90%', '80%'], walk: [45, 60, 60] }),
+      {
+        label: 'Day 3', name: 'Warrior MUSCLE Day', type: 'muscle',
+        blocks: [WARMUP,
+          { repeat: 3, section: 'Circuit', roundWord: 'Round', between: R(120, 'Rest between rounds', 'Rest 2 minutes, then back to top.'),
+            steps: [W('Pull-Ups', 40, 'Mod: isometric hold', { how: 'Chin Ups or Pull-Ups', say: 'pull ups' }), R(40),
+              W('Russian Twist', 40, 'Mod: see video'), R(40),
+              W('Burpees', 40, 'Mod: see video'), R(40),
+              W('Wall Sits', 40, '', { how: 'Wall Sit', say: 'wall sit' }), R(40),
+              W('Dips', 40, '', { how: 'Bench Dips' })] },
+          COOL()]
+      },
+      runComboDay('Day 4', { sets: 12, rot: [RX.mc, RX.hh, RX.hk], ex: [20, 15, 15], jog: [45, 30, 30], sprint: [15, 15, 10],
+        pct: ['80-90%', '80-90%', '80%'], walk: [45, 45, 45] }),
+      {
+        label: 'Day 5', name: 'Warrior MUSCLE Time Under Tension Day', type: 'muscle',
+        intro: ['Perform 8 reps of each exercise in a slow cadence: 4 seconds up, pause 2 seconds, 4 seconds down (10 seconds per rep). You may not be able to do all 8 reps at this cadence but make your best attempt.',
+          'The doc says you won\u2019t need an interval timer today \u2014 this timer simply paces the reps; tap Skip if you finish early.',
+          'End of Week 3 \u2014 did you get all your points?'],
+        blocks: [WARMUP,
+          { repeat: 2, section: 'TUT Circuit', roundWord: 'Round', between: R(120, 'Rest between rounds', 'Rest 2 minutes, then back to top.'),
+            steps: [TUT('Air Squats', 'Air Squats', 8, 4, 2, 4), R(60),
+              TUT('Pushups', 'Slow Push-Up', 8, 4, 2, 4, 0, 'push ups'), R(60),
+              TUT('Hollow Body Crunch', 'Hollow Body Crunch', 8, 4, 2, 4), R(60),
+              TUT('Pull-Up / Chin-Up', 'Chin Ups or Pull-Ups', 8, 4, 2, 4, 0, 'pull up or chin up'), R(60),
+              TUT('Dips', 'Bench Dips', 8, 4, 2, 4)] },
+          COOL()]
+      }
+    ]
+  },
+  /* ------------------------------ WEEK 4 ------------------------------ */
+  {
+    week: 4, title: 'Week 4',
+    note: 'If injured where walking is the only option, do 12,000 steps in a day using a step tracker and upload a Sweaty Selfie while walking.',
+    days: [
+      {
+        label: 'Day 1', name: 'Warrior Muscle Circuit', type: 'muscle',
+        blocks: [WARMUP,
+          { repeat: 3, section: 'Circuit', roundWord: 'Round', between: R(120, 'Rest between rounds', 'Rest 2 minutes, then back to top.'),
+            steps: [W('Wall Sits', 60, '', { how: 'Wall Sit', say: 'wall sit' }), R(45),
+              W('Sit-Ups', 60, 'Mod: knees in', { how: 'Sit-ups', say: 'sit ups' }), R(45),
+              W('Walking Lunges', 60), R(45),
+              W('Plank-Ups', 45, '', { say: 'plank ups' }), R(45),
+              W('Horizontal Bar Row', 30, '', { how: 'Straight Bar Rows' })] },
+          COOL()]
+      },
+      runComboDay('Day 2', { sets: 8, rot: [RX.bur, RX.jj, RX.ep], ex: [25, 20, 15], jog: [60, 60, 60], sprint: [20, 15, 15],
+        pct: ['80-90%', '80-90%', '80%'], walk: [60, 80, 80] }),
+      {
+        label: 'Day 3', name: 'Warrior MUSCLE Day', type: 'muscle',
+        blocks: [WARMUP,
+          { repeat: 3, section: 'Circuit', roundWord: 'Round', between: R(120, 'Rest between rounds', 'Rest 2 minutes, then back to top.'),
+            steps: [W('Pull-Ups', 30, 'Mod: isometric hold', { how: 'Chin Ups or Pull-Ups', say: 'pull ups' }), R(40),
+              W('Windshield Wipers', 40, 'Mod: see video'), R(40),
+              W('Pushups', 40, 'Mod: see video', { how: 'Push Ups', say: 'push ups' }), R(40),
+              W('Explosive Jump Squats', 40, 'Mod: air squats'), R(40),
+              W('Plank-Ups', 40, '', { say: 'plank ups' })] },
+          COOL()]
+      },
+      runComboDay('Day 4', { sets: 12, rot: [RX.mc, RX.hh, RX.hk], ex: [25, 20, 15], jog: [45, 30, 30], sprint: [15, 12, 10],
+        pct: ['80-90%', '80-90%', '80%'], walk: [60, 60, 60] }),
+      {
+        label: 'Day 5', name: 'Warrior MUSCLE Time Under Tension Day', type: 'muscle',
+        intro: ['Perform 3 reps of each exercise in a slow cadence: 6 seconds up, pause 3 seconds, 6 seconds down (15 seconds per rep, 45 sec total). You may not be able to do all 3 reps at this cadence but make your best attempt.',
+          'End of Week 4 \u2014 did you get all 10 points?'],
+        blocks: [WARMUP,
+          { repeat: 4, section: 'TUT Circuit', roundWord: 'Round', between: R(180, 'Rest between rounds', 'Rest 3 minutes, then back to top.'),
+            steps: [TUT('Air Squats', 'Air Squats', 3, 6, 3, 6), R(30),
+              TUT('Pushups', 'Slow Push-Up', 3, 6, 3, 6, 0, 'push ups'), R(30),
+              TUT('Hollow Body Crunch', 'Hollow Body Crunch', 3, 6, 3, 6), R(30),
+              TUT('Horizontal Bar Rows', 'Straight Bar Rows', 3, 6, 3, 6), R(30),
+              TUT('Dips', 'Bench Dips', 3, 6, 3, 6)] },
+          COOL()]
+      }
+    ]
+  },
+  /* ------------------------------ WEEK 5 ------------------------------ */
+  {
+    week: 5, title: 'Week 5',
+    note: 'For additional modifications on exercises, contact Coach Jeremy.',
+    days: [
+      {
+        label: 'Day 1', name: 'Warrior Muscle Circuit', type: 'muscle',
+        blocks: [WARMUP,
+          { repeat: 4, section: 'Circuit', roundWord: 'Round', between: R(120, 'Rest between rounds', 'Rest 2 minutes, then back to top.'),
+            steps: [W('Walking Lunges', 60), R(30),
+              W('Hollow Body Hold', 45, 'Mod: knees in'), R(30),
+              W('Slow Push-Ups', 60, 'TWO 30-second slow push-ups: 15 sec down, 15 sec up x 2 (mod: knee-based slow push-ups)',
+                { how: 'Slow Push-Up', say: 'slow push ups', tempo: { reps: 2, phases: [['Down', 15], ['Up', 15]] } }), R(30),
+              W('Horizontal Bar Rows', 45, '', { how: 'Straight Bar Rows' }), R(30),
+              W('Dip Glute Blasters', 45, '2-second hold on glute squeeze \u2014 should do 10-15 reps')] },
+          COOL()]
+      },
+      W5_LIGHT,
+      assessmentDay('Day 3', 'Mid-Program Re-Test', ['Mid-way program re-test \u2014 same metrics as your initial testing.',
+        'Doc: no interval timer, use a stopwatch \u2014 this timer runs each 30-second test for you and records your numbers.',
+        'Take at least two minutes between each exercise.']),
+      runComboDay('Day 4', { sets: 10, rot: [RX.pu, RX.gb, RX.fk], ex: [25, 20, 20], jog: [60, 60, 60], sprint: [20, 15, 15],
+        pct: ['80-90%', '80-90%', '80%'], walk: [45, 60, 75] }),
+      {
+        label: 'Day 5', name: 'Warrior MUSCLE Time Under Tension', type: 'muscle',
+        intro: ['Perform 4 (FOUR) reps of each exercise in a slow cadence: 5 seconds up, pause 5 seconds, 5 seconds down (15 seconds per rep).',
+          'If you get exhausted, pause briefly and then get right back to it.',
+          'End of Week 5 \u2014 did you get all 10 points?'],
+        blocks: [WARMUP,
+          { repeat: 3, section: 'TUT Circuit', roundWord: 'Set', between: R(120, 'Rest between sets', 'Rest 2 minutes, then back to top.'),
+            steps: [TUT('Air Squats', 'Air Squats', 4, 5, 5, 5), R(30),
+              TUT('Pushups', 'Slow Push-Up', 4, 5, 5, 5, 0, 'push ups'), R(30),
+              TUT('Hollow Body Crunch', 'Hollow Body Crunch', 4, 5, 5, 5), R(30),
+              TUT('Pull-Up / Chin-Up', 'Chin Ups or Pull-Ups', 4, 5, 5, 5, 0, 'pull up or chin up'), R(30),
+              TUT('Dip Glute Blaster', 'Dip Glute Blasters', 4, 5, 5, 5)] },
+          COOL()]
+      }
+    ],
+    resDays: [
+      {
+        label: 'Day 1', name: 'Warrior Muscle Circuit', type: 'muscle',
+        blocks: [WARMUP,
+          { repeat: 3, section: 'Circuit', roundWord: 'Round', between: R(120, 'Rest between rounds', 'Rest 2 minutes, then back to top.'),
+            steps: [W('Pull-Ups', 40, 'Or a modification with the same muscle group', { how: 'Chin Ups or Pull-Ups', say: 'pull ups' }), R(30),
+              W('Side Plank with Twist \u2014 Right', 40, '', { how: 'Side Plank with Twist', say: 'right side plank with twist' }), R(30),
+              W('Side Plank with Twist \u2014 Left', 40, '', { how: 'Side Plank with Twist', say: 'left side plank with twist' }), R(30),
+              W('Shoulder Press', 40, 'Bands or dumbbells'), R(30),
+              W('Overhead Tricep', 40, 'Bands or dumbbells on bench', { how: 'Overhead Triceps', say: 'overhead triceps' }), R(30),
+              W('Push-ups', 40, '', { how: 'Push Ups', say: 'push ups' })] },
+          COOL()]
+      },
+      W5_LIGHT, null, null,
+      {
+        label: 'Day 5', name: 'Warrior Muscle Circuit', type: 'muscle',
+        blocks: [WARMUP,
+          { repeat: 3, section: 'Circuit', roundWord: 'Round', between: R(120, 'Rest between rounds', 'Rest 2 minutes, then back to top.'),
+            steps: [W('Horizontal Bar Rows', 45, 'Bands or dumbbells', { how: 'Resistance Rows', say: 'rows' }), R(40),
+              W('Overhead Tricep Press', 45, 'Bands or dumbbells', { how: 'Overhead Triceps', say: 'overhead tricep press' }), R(40),
+              W('Plank Crunches', 45), R(40),
+              W('Shoulder Press', 45, 'Bands or dumbbells'), R(40),
+              W('Bulgarian Split Squats', 60, '30 sec each leg', { how: 'Bulgarian Split Squat', cueAt: 30, cue: 'Switch legs' }), R(40),
+              ONE_MIN_PU(60, 'One minute push-up: 30 sec down, 30 sec up')] },
+          COOL()]
+      }
+    ]
+  },
+  /* ------------------------------ WEEK 6 ------------------------------ */
+  {
+    week: 6, title: 'Week 6',
+    note: 'Coach: the interval timer app is always set to the Advanced group \u2014 adjust as needed (pick your level on each day).',
+    days: [
+      runComboDay('Day 1', { sets: 10, rot: [RX.pu, RX.hh, RX.ps], ex: [25, 20, 15], jog: [60, 60, 60], sprint: [20, 15, 15],
+        pct: ['80-90%', '80-90%', '80%'], walk: [60, 80, 80] }),
+      {
+        label: 'Day 2', name: 'Warrior MUSCLE Day', type: 'muscle',
+        intro: ['Circuit 3x through. Times are for the Advanced group; pick your level above.'],
+        levels: cutLevels(10, 20),
+        blocks: lvl => [WARMUP,
+          { repeat: 3, section: 'Circuit', roundWord: 'Round', between: R(120, 'Rest between rounds', 'Rest 2 minutes, then back to top.'),
+            steps: [W('Wall Sits', cut(lvl, 90, 10, 20), '', { how: 'Wall Sit', say: 'wall sit' }), R(45),
+              W('Plank Crunches', cut(lvl, 60, 10, 20), 'Mod: elbow plank'), R(45),
+              ONE_MIN_PU(cut(lvl, 60, 10, 20), `ONE slow push-up: half the time down, half up (mod: TWO 30 sec push-ups)`), R(45),
+              W('Horizontal Bar Row', cut(lvl, 40, 10, 20), 'Mod: hollow body hold', { how: 'Straight Bar Rows' }), R(45),
+              W('Explosive Jump Squats', cut(lvl, 40, 10, 20), 'Mod: air squats')] },
+          COOL()]
+      },
+      runComboDay('Day 3', { sets: 12, rot: [RX.mc, RX.hh, RX.hk], ex: [25, 20, 15], jog: [45, 45, 45], sprint: [25, 20, 15],
+        pct: ['80-90%', '80-90%', '80-90%'], walk: [75, 75, 75] }),
+      {
+        label: 'Day 4', name: 'Warrior MUSCLE Day', type: 'muscle',
+        intro: ['Circuit 3x through. Times are for the Advanced group; pick your level above.'],
+        levels: cutLevels(5, 10),
+        blocks: lvl => [WARMUP,
+          { repeat: 3, section: 'Circuit', roundWord: 'Round', between: R(120, 'Rest between rounds', 'Rest 2 minutes, then back to top.'),
+            steps: [W('Hanging Leg Raises', cut(lvl, 45, 5, 10), 'Mod: knee raises'), R(45),
+              W('Fast Burpees', cut(lvl, 45, 5, 10), 'Mod: slow burpee', { how: 'Burpees', say: 'fast burpees' }), R(45),
+              W('Plank Supermans', cut(lvl, 60, 5, 10), 'Mod: supermans'), R(45),
+              W('Dip Glute Blaster', cut(lvl, 60, 5, 10), 'Mod: dips', { how: 'Dip Glute Blasters' }), R(45),
+              W('Bulgarian Split Squat', cut(lvl, 60, 5, 10), 'Mod: air squats \u2014 switch legs halfway',
+                { cueAt: Math.round(cut(lvl, 60, 5, 10) / 2), cue: 'Switch legs' })] },
+          COOL()]
+      },
+      {
+        label: 'Day 5', name: 'Warrior INTERVAL RUN Day', type: 'run',
+        intro: ['End of Week 6 \u2014 did you get all 10 points?'],
+        levels: { advanced: 'Advanced: 12 sets \u00b7 75 sec walk + 45 sec 50% jog + 30 sec 80% max-effort sprint',
+          intermediate: 'Intermediate: 10 sets \u00b7 75 sec walk + 45 sec 60% jog + 20 sec 80% max-effort sprint',
+          beginner: 'Beginner: 8 sets \u00b7 75 sec walk + 60 sec 60% jog + 20 sec 80% max-effort sprint' },
+        blocks: lvl => [WARMUP,
+          { repeat: lv(lvl, 12, 10, 8), section: 'Interval Run', roundWord: 'Set', continuous: true, steps: [
+            R(75, 'Walk', ''),
+            W('Jog', lv(lvl, 45, 45, 60), lv(lvl, '50%', '60%', '60%') + ' jog', { how: 'Jog', say: 'jog' }),
+            W('Sprint', lv(lvl, 30, 20, 20), '80% max effort', { how: 'Sprint', say: 'sprint' })] },
+          COOL('Cool down. Stretch as needed. Drink lots of water.')]
+      }
+    ],
+    resDays: [
+      {
+        label: 'Day 1', name: 'Warrior MUSCLE Day', type: 'muscle',
+        intro: ['Circuit 4x through. Times are for the Advanced group; pick your level above.'],
+        levels: cutLevels(10, 15),
+        blocks: lvl => [WARMUP,
+          { repeat: 4, section: 'Circuit', roundWord: 'Round', between: R(90, 'Rest between rounds', 'Rest 90 secs, then back to top.'),
+            steps: [W('Squats', cut(lvl, 45, 10, 15), 'Bands or dumbbells', { how: 'Weighted Squats' }), R(45),
+              W('Bicep Curls', cut(lvl, 45, 10, 15), 'Bands or dumbbells'), R(45),
+              W('Pull-Ups', cut(lvl, 45, 10, 15), 'Iso-holds at failure \u2014 don\u2019t STOP', { say: 'pull ups' }), R(45),
+              W('Shoulder Press', cut(lvl, 40, 10, 15), 'Bands or dumbbells')] },
+          R(90, 'Rest', 'Rest 90 secs before the finisher.', { section: 'Finisher' }),
+          W('Hollow Body Hold', 80, '80 second hollow body hold. Can you do it?', { section: 'Finisher' }),
+          COOL('Stretch as needed. Drink lots of water.')]
+      },
+      runComboDay('Day 2', { sets: 12, rot: [RX.pu, RX.hh, RX.ps], ex: [30, 20, 15], jog: [20, 30, 45], sprint: [15, 15, 15],
+        pct: ['80-90%', '80-90%', '80%'], walk: [60, 60, 60] }),
+      {
+        label: 'Day 3', name: 'Warrior MUSCLE Day', type: 'muscle',
+        intro: ['Circuit 4x through. Times are for the Advanced group; pick your level above.'],
+        levels: cutLevels(10, 15),
+        blocks: lvl => [WARMUP,
+          { repeat: 4, section: 'Circuit', roundWord: 'Round', between: R(90, 'Rest between rounds', 'Rest 90 secs, then back to top.'),
+            steps: [W('Dip Glute Blaster', cut(lvl, 45, 10, 15), '', { how: 'Dip Glute Blasters' }), R(45),
+              W('Russian Routine', cut(lvl, 45, 10, 15), 'Bands or dumbbells'), R(45),
+              W('Pectoral Flys', cut(lvl, 45, 10, 15), 'Bands or dumbbells on bench'), R(45),
+              W('Tricep Overhead Ext.', cut(lvl, 45, 10, 15), 'Bands or dumbbells on bench', { how: 'Overhead Triceps', say: 'overhead tricep extension' }), R(45),
+              W('High Knees', cut(lvl, 45, 10, 15))] },
+          R(90, 'Rest', 'Rest 90 secs before the finisher.', { section: 'Finisher' }),
+          W('Wall Sit', 120, '120 second wall sit. Can you do it?', { section: 'Finisher' }),
+          COOL('Stretch as needed. Drink lots of water.')]
+      },
+      INTERVAL_15('Day 4'),
+      {
+        label: 'Day 5', name: 'Warrior Muscle Circuit + Burn Out', type: 'muscle',
+        intro: ['Circuit 2x through, then complete the burn out sets. Post each total to your triad.'],
+        blocks: [WARMUP,
+          { repeat: 2, section: 'Circuit', roundWord: 'Round', between: R(120, 'Rest between rounds', 'Rest TWO MINUTES, then back to top.'),
+            steps: [W('Horizontal Bar Rows', 45, 'Bands or dumbbells', { how: 'Resistance Rows', say: 'rows' }), R(45),
+              W('Overhead Tricep Press', 45, 'Bands or dumbbells', { how: 'Overhead Triceps', say: 'overhead tricep press' }), R(45),
+              W('Plank Crunches', 45), R(45),
+              W('Shoulder Press', 45, 'Bands or dumbbells'), R(45),
+              W('Bulgarian Split Squats', 60, '30 sec each leg', { how: 'Bulgarian Split Squat', cueAt: 30, cue: 'Switch legs' }), R(45),
+              ONE_MIN_PU(60, 'One minute push-up: 30 sec down, 30 sec up')] },
+          R(120, 'Rest', 'Rest before the burn out sets.', { section: 'Burn Out' }),
+          ...BURN('Explosive Jumping Jacks', 'Explosive Jumping Jacks', 'jumping jacks'),
+          R(90, 'Rest', 'REST 90 SECS', { section: 'Burn Out' }),
+          ...BURN('Hollow Body Crunches', 'Hollow Body Crunch', 'hollow body crunches'),
+          R(90, 'Rest', 'REST 90 SECS', { section: 'Burn Out' }),
+          ...BURN('Burpees', 'Burpees', 'burpees'),
+          COOL()]
+      }
+    ]
+  },
+  /* ------------------------------ WEEK 7 ------------------------------ */
+  {
+    week: 7, title: 'Week 7',
+    note: 'Body weight only. For additional modifications on exercises, contact Coach Jeremy.',
+    days: [
+      {
+        label: 'Day 1', name: 'Warrior Muscle Circuit', type: 'muscle',
+        blocks: [WARMUP,
+          { repeat: 4, section: 'Circuit', roundWord: 'Round', between: R(90, 'Rest between rounds', 'Rest 90 secs, then back to top.'),
+            steps: [W('Four Way Lunges', 60), R(30),
+              W('Hollow Body Hold', 45, 'Mod: knees in'), R(30),
+              W('Push-ups', 45, '', { how: 'Push Ups', say: 'push ups' }), R(30),
+              W('Horizontal Bar Rows', 45, '', { how: 'Straight Bar Rows' }), R(30),
+              W('Dip Glute Blasters', 45, '2-second hold on glute squeeze \u2014 should do 10-15 reps')] },
+          COOL()]
+      },
+      runComboDay('Day 2', { sets: 12, rot: [RX.hkl, RX.hh, RX.ps], ex: [30, 20, 15], jog: [20, 30, 45], sprint: [15, 15, 15],
+        pct: ['80-90%', '80-90%', '80%'], walk: [60, 60, 60] }),
+      {
+        label: 'Day 3', name: 'Warrior Muscle Circuit', type: 'muscle',
+        blocks: [WARMUP,
+          { repeat: 3, section: 'Circuit', roundWord: 'Round', between: R(120, 'Rest between rounds', 'Rest TWO MINUTES, then back to top.'),
+            steps: [W('Leg Raises or Knee Raises', 45, '', { how: 'Leg Raises', say: 'leg raises or knee raises' }), R(45),
+              W('Plank Supermans', 45, '5 sec hold each'), R(45),
+              W('Bulgarian Split Squat \u2014 Right Leg', 45, '', { how: 'Bulgarian Split Squat', say: 'Bulgarian split squat, right leg' }), R(45),
+              W('Bulgarian Split Squat \u2014 Left Leg', 45, '', { how: 'Bulgarian Split Squat', say: 'Bulgarian split squat, left leg' }), R(45),
+              W('Pull-Ups', 45, 'Isometric holds at failure', { say: 'pull ups' }), R(45),
+              W('Wall Sits', 100, '', { how: 'Wall Sit', say: 'wall sit' })] },
+          COOL()]
+      },
+      INTERVAL_15('Day 4'),
+      {
+        label: 'Day 5', name: 'Warrior Muscle Circuit + Burn Out', type: 'muscle',
+        intro: ['Circuit 2x through PLUS one burn out set. Post each total to your triad.'],
+        blocks: [WARMUP,
+          { repeat: 2, section: 'Circuit', roundWord: 'Round', between: R(120, 'Rest between rounds', 'Rest TWO MINUTES, then back to top.'),
+            steps: [W('Explosive Jump Squats', 30, 'Mod: air squat'), R(45),
+              W('Plank-Ups', 30, '', { say: 'plank ups' }), R(45),
+              W('Hollow Body Crunches', 30, '', { how: 'Hollow Body Crunch' }), R(45),
+              W('High Knees', 30), R(45),
+              W('Burpees', 30)] },
+          R(120, 'Rest', 'Rest before the burn out set.', { section: 'Burn Out' }),
+          ...BURN('Explosive Jump Squats', 'Explosive Jump Squats', 'jump squats'),
+          R(90, 'Rest', 'Rest 90 secs', { section: 'Burn Out' }),
+          ...BURN('Hollow Body Crunches', 'Hollow Body Crunch', 'hollow body crunches'),
+          R(90, 'Rest', 'Rest 90 secs', { section: 'Burn Out' }),
+          ...BURN('Burpees', 'Burpees', 'burpees'),
+          COOL()]
+      }
+    ]
+  },
+  /* ------------------------------ WEEK 8 ------------------------------ */
+  {
+    week: 8, title: 'Week 8',
+    note: 'FINAL WEEK. The re-test can be done on the day of your choosing and counts as one of your workouts. If injured where walking is the only option, do 12,000 steps in a day (full credit).',
+    days: [
+      assessmentDay('Day 1', 'Final Re-Test', ['Final testing day \u2014 Warrior\u2019s choice: do it on any day this week; it counts as one of your workouts.',
+        'Recommended after a good night\u2019s sleep, on a day you feel motivated. Take a sweaty selfie for your triad.',
+        'If your initial test used different metrics due to injury or otherwise, use the same method as your original test day.',
+        'Take at least two minutes between each exercise.']),
+      {
+        label: 'Day 2', name: 'Warrior Muscle Circuit', type: 'muscle',
+        intro: ['Note: most of you cannot do push-ups or bench dips for 60 seconds (prove me wrong). The point is muscle exhaustion rather than resting when you cannot pump another rep. Do not lay down. If you cannot go further, hold at the midpoint; if you cannot hold at midpoint, hold at the top. If you must fall to your chest, pop back up ASAP.'],
+        blocks: [WARMUP,
+          { repeat: 3, section: 'Circuit', roundWord: 'Circuit', between: R(180, 'Rest between circuits', 'Rest 3 minutes, then repeat.'),
+            steps: [W('Explosive Jump Squats', 60), R(45),
+              W('Forearm Plank', 60), R(45),
+              W('Push Ups', 60, 'Good form / steady rhythm \u2014 hold at the midpoint or top rather than stopping'), R(45),
+              W('Explosive Jumping Jacks', 60), R(45),
+              W('Bench Dips', 60, 'Hold at the midpoint or top rather than stopping')] },
+          R(45, 'Rest', '', { section: 'Finisher' }),
+          W('Wall Sit', 180, 'Close out with a 3 minute wall sit. Don\u2019t you dare quit on this.', { section: 'Finisher' }),
+          COOL()]
+      },
+      {
+        label: 'Day 3', name: 'Warrior Run Day', type: 'run',
+        intro: ['15 sets interval run (see video explanation), then a 3 minute walk, then a hollow body HOLD until failure. Post your time to your small team.'],
+        levels: { advanced: 'Advanced: set = 30 sec high intensity (80%) + 30 sec jog (50%) + 60 sec walk',
+          intermediate: 'Intermediate: set = 25 sec (80% effort) + 25 sec jog (50%) + 60 sec walk',
+          beginner: 'Beginner: set = 20 sec (80% effort) + 20 sec jog (50%) + 60 sec walk' },
+        blocks: lvl => [WARMUP,
+          { repeat: 15, section: 'Interval Run', roundWord: 'Set', continuous: true, steps: [
+            W('Sprint', lv(lvl, 30, 25, 20), 'High intensity (80% effort)', { how: 'Sprint', say: 'sprint' }),
+            W('Jog', lv(lvl, 30, 25, 20), 'Medium intensity jog (50% effort)', { how: 'Jog', say: 'jog' }),
+            R(60, 'Walk', 'Low intensity (walking)')] },
+          R(180, '3-minute walk', '', { section: 'Finisher' }),
+          W('Hollow Body Hold \u2014 to failure', null, 'Head off the ground. As soon as your head, feet or arms touch the ground, tap Done. Post your time to your small team.',
+            { how: 'Hollow Body Hold', say: 'hollow body hold to failure', section: 'Finisher', record: true, recordLabel: 'Hollow body hold' }),
+          COOL()]
+      },
+      {
+        label: 'Day 4', name: 'Warrior Muscle Day', type: 'muscle',
+        blocks: [WARMUP,
+          { repeat: 5, section: 'Circuits', roundWord: 'Circuit', between: R(120, 'Rest between circuits', '2 minutes rest, then repeat.'),
+            steps: [W('Chin Ups', 25, 'Mod: isometric hold at top point', { how: 'Chin Ups or Pull-Ups', say: 'chin ups' }), R(25),
+              W('Windshield Wipers', 25), R(25),
+              W('Straight Bar Rows', 25, 'Mod: explosive jumping jacks'), R(25),
+              W('Glute Bridges', 25), R(25),
+              W('High Knees', 25, 'Fast and high')] },
+          COOL()]
+      },
+      {
+        label: 'Day 5', name: 'Warrior Run Day \u2014 FINAL DAY', type: 'run',
+        intro: ['THIS IS THE FINAL DAY. Give it all you\u2019ve got. Don\u2019t blow your load in the first 10 minutes.',
+          '30 minutes with the AllTrails app measuring your total distance: find a level surface, start the app and go. How much ground can you cover? Post how far you made it.',
+          'On an elliptical or bike, same thing \u2014 measure distance by the metric it uses. Don\u2019t leave anything on the table!'],
+        blocks: [WARMUP,
+          W('30-Minute Distance Run', 1800, 'Track your distance with the AllTrails app (level surface). Elliptical or bike: use its distance.',
+            { how: 'Distance Run', say: 'thirty minute distance run', section: 'Final Run' }),
+          LOGSTEP('Log your distance', null, 'miles', { section: 'Final Run', decimal: true, logLabel: '30-minute distance', say: 'your distance' }),
+          COOL('This is your final workout for this round of WARRIOR | MBS. Congrats!')]
+      }
+    ]
+  }
+);
+/* Days that are identical in the bodyweight and resistance versions */
+WEEKS.forEach(w => { if (w.resDays) w.resDays = w.resDays.map((d, i) => d || w.days[i]); });
+
+
 /* ===================== helpers ===================== */
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -614,18 +1468,23 @@ function howHtml(how, title) {
 }
 
 /* Flatten a day's blocks into a linear list of steps. */
+const dayBlocks = (d, lvl) => typeof d.blocks === 'function' ? d.blocks(lvl || 'beginner') : d.blocks;
+const hasVeteran = d => dayBlocks(d).some(b => b && b.veteran);
+const hasLevels = d => !!(d.levels || d.levelsSame);
 function expandDay(day, opts) {
   const out = [];
   const add = (s, meta) => out.push(Object.assign({}, s, meta));
-  for (const b of day.blocks) {
+  for (const b of dayBlocks(day, opts.level)) {
     if (b.veteran && !opts.veteran) continue;
     if (b.repeat) {
+      const leadRest = b.continuous && b.steps[0].kind === REST;   // block opens with a walk: no get-ready needed
       for (let r = 1; r <= b.repeat; r++) {
         const meta = { section: b.section || '', round: r, rounds: b.repeat, roundWord: b.roundWord || 'Round', veteran: !!b.veteran };
         let workSeen = false;
-        b.steps.forEach(s => {
+        b.steps.forEach(s0 => {
+          const s = s0.rot ? Object.assign({}, s0, s0.rot[(r - 1) % s0.rot.length]) : s0;   // rotating exercise
           const m = Object.assign({}, meta);
-          if (b.continuous && s.kind === WORK) { if (r > 1 || workSeen) m.noReady = true; workSeen = true; }
+          if (b.continuous && s.kind === WORK) { if (leadRest || r > 1 || workSeen) m.noReady = true; workSeen = true; }
           add(s, m);
         });
         if (b.between && r < b.repeat) add(b.between, Object.assign({}, meta, { betweenRounds: true }));
@@ -637,7 +1496,7 @@ function expandDay(day, opts) {
   out.forEach(s => {
     if (s.effort && day.effortShort) s.effortText = day.effortShort[opts.level] || '';
   });
-  // insert a 5-second "Get ready" step before every work step (except continuous run intervals)
+  // insert a 5-second "Get ready" step before every work step (except continuous run intervals / noReady steps)
   const res = [];
   out.forEach(s => {
     if (s.kind === WORK && !s.noReady) {
@@ -651,66 +1510,111 @@ function expandDay(day, opts) {
 }
 const fixedTotal = steps => steps.reduce((a, s) => a + (s.sec || 0), 0);
 const openCount = steps => steps.filter(s => s.sec == null && s.kind === WORK).length;
+const logCount = steps => steps.filter(s => s.kind === LOG).length;
 const readyCount = steps => steps.filter(s => s.kind === READY).length;
 
 /* ===================== state ===================== */
-const UI = { week: 0, day: 0, level: 'beginner', veteran: false };
+const UI = { week: 0, day: 0, level: 'beginner', veteran: false, mode: 'bw' };
 let muted = false;
 try { muted = localStorage.getItem('warriorTimerMuted') === '1'; } catch (e) {}
 const T = { steps: [], idx: 0, started: false, running: false, stepStart: 0, stepAccum: 0, fired: {},
-  activeMs: 0, activeStart: 0, startedAt: 0, results: [], day: null };
+  activeMs: 0, activeStart: 0, startedAt: 0, rec: {}, day: null };
 
 const curWeek = () => WEEKS[UI.week];
-const curDay = () => curWeek().days[UI.day];
+const isRes = () => UI.mode === 'res' && !!curWeek().resDays;
+const curDays = () => isRes() ? curWeek().resDays : curWeek().days;
+const curDay = () => curDays()[UI.day];
+const UI_KEY = 'warriorTimerUI';
+try {
+  const sv = JSON.parse(localStorage.getItem(UI_KEY) || 'null');
+  if (sv) {
+    if (sv.week >= 0 && sv.week < WEEKS.length) UI.week = sv.week | 0;
+    if (sv.mode === 'bw' || sv.mode === 'res') UI.mode = sv.mode;
+    if (LEVELS.some(l => l[0] === sv.level)) UI.level = sv.level;
+    if (sv.day >= 0 && sv.day < curDays().length) UI.day = sv.day | 0;
+  }
+} catch (e) {}
+function saveUI() {
+  try { localStorage.setItem(UI_KEY, JSON.stringify({ week: UI.week, day: UI.day, mode: UI.mode, level: UI.level })); } catch (e) {}
+}
+
+/* ---------- saved assessment results (this phone only) ---------- */
+const ASSESS_KEY = 'warriorAssessments';
+const ASSESS_COLS = TESTS.map(t => [t.key, t.name, 'reps', t.ranges]).concat([['mileSec', '1-mile run', 'time', MILE_RANGES]]);
+function loadAssess() { try { const a = JSON.parse(localStorage.getItem(ASSESS_KEY) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+function saveAssess(entry) { const a = loadAssess(); a.push(entry); try { localStorage.setItem(ASSESS_KEY, JSON.stringify(a)); } catch (e) {} }
+function fmtVal(v, unit) {
+  if (v == null || v === '') return '\u2013';
+  if (unit === 'time') return fmt(v);
+  if (unit === 'miles') return v + ' mi';
+  if (unit === 'sec') return v + ' s';
+  return String(v);
+}
+function historyHtml(limit) {
+  const a = loadAssess().slice(-limit).reverse();
+  if (!a.length) return '';
+  return `<div class="label">Your saved test results (this phone)</div><div class="tblwrap"><table class="tbl"><tr><th>Date</th><th>Test</th>` +
+    ASSESS_COLS.map(c => `<th>${esc(c[1])}</th>`).join('') + '</tr>' +
+    a.map(e => `<tr><td>${esc(new Date(e.date).toLocaleDateString())}</td><td>${esc(e.test || '')}</td>` +
+      ASSESS_COLS.map(c => `<td>${esc(fmtVal(e[c[0]], c[2]))}</td>`).join('') + '</tr>').join('') + '</table></div>';
+}
 
 /* ===================== setup UI ===================== */
 function buildSetup() {
-  const ws = $('weekSel');
-  if (WEEKS.length > 1) {
-    $('weekWrap').classList.remove('hidden');
-    ws.innerHTML = WEEKS.map((w, i) => `<option value="${i}">${esc(w.title)}</option>`).join('');
-    ws.value = UI.week;
-  }
-  $('weekLabel').textContent = curWeek().title + ' \u00b7 workout day';
-  $('days').innerHTML = curWeek().days.map((d, i) => {
+  $('weekSeg').innerHTML = WEEKS.map((w, i) => `<button data-w="${i}" aria-label="${esc(w.title)}">${w.week}</button>`).join('');
+  $('modeSeg').innerHTML = [['bw', 'Bodyweight', ''], ['res', 'Resistance', 'bands or dumbbells']]
+    .map(([k, l, sub]) => `<button data-m="${k}">${l}${sub ? `<small>${sub}</small>` : ''}</button>`).join('');
+  if (UI.day >= curDays().length) UI.day = 0;
+  $('weekLabel').textContent = curWeek().title + (isRes() ? ' \u00b7 resistance' : '') + ' \u00b7 workout day';
+  $('days').innerHTML = curDays().map((d, i) => {
     const tot = fixedTotal(expandDay(d, { veteran: false, level: UI.level }));
-    return `<button class="day${i === UI.day ? ' sel' : ''}" data-i="${i}"><b>${esc(d.label)}</b><small>${esc(d.name.replace(/^Warrior /, ''))}</small><small class="dt">${fmt(tot)}</small></button>`;
+    return `<button class="day${i === UI.day ? ' sel' : ''}" data-i="${i}"><b>${esc(d.label)}</b><small>${esc(d.name.replace(/^Warrior /, ''))}</small><small class="dt">${fmt(tot)}${d.assessment ? ' + run' : ''}</small></button>`;
   }).join('');
   $('levelSeg').innerHTML = LEVELS.map(([k, l]) => `<button data-l="${k}" class="${k === UI.level ? 'sel' : ''}">${l}</button>`).join('');
   renderSetup();
 }
 function renderSetup() {
-  const d = curDay();
+  const w = curWeek(), d = curDay();
+  saveUI();
+  document.querySelectorAll('#weekSeg button').forEach(b => b.classList.toggle('sel', +b.dataset.w === UI.week));
+  $('modeWrap').classList.toggle('hidden', !w.resDays);
+  document.querySelectorAll('#modeSeg button').forEach(b => b.classList.toggle('sel', b.dataset.m === (isRes() ? 'res' : 'bw')));
+  $('weekNote').classList.toggle('hidden', !w.note);
+  $('weekNote').textContent = w.note || '';
   document.querySelectorAll('.day').forEach(b => b.classList.toggle('sel', +b.dataset.i === UI.day));
   document.querySelectorAll('#levelSeg button').forEach(b => b.classList.toggle('sel', b.dataset.l === UI.level));
-  const isRun = d.type === 'run';
-  $('levelWrap').classList.toggle('hidden', !isRun);
-  if (isRun) $('effortTxt').textContent = d.levels ? d.levels[UI.level] : (d.levelsSame || '');
-  const hasVet = d.blocks.some(b => b.veteran);
+  const lvls = hasLevels(d);
+  $('levelWrap').classList.toggle('hidden', !lvls);
+  $('levelLbl').textContent = d.type === 'run' ? 'Run level' : 'Level';
+  if (lvls) $('effortTxt').textContent = d.levels ? d.levels[UI.level] : (d.levelsSame || '');
+  const hasVet = hasVeteran(d);
   $('vetRow').classList.toggle('hidden', !hasVet);
   $('vetDesc').textContent = hasVet ? 'Optional add-on: ' + d.vetDesc : '';
   $('vetSw').setAttribute('aria-checked', String(UI.veteran && hasVet));
   $('soundSw').setAttribute('aria-checked', String(!muted));
 
   const steps = expandDay(d, { veteran: UI.veteran && hasVet, level: UI.level });
-  const open = openCount(steps);
+  const open = openCount(steps), nLog = logCount(steps);
   $('totalTxt').textContent = fmt(fixedTotal(steps));
-  const nReady = readyCount(steps), nMain = steps.length - nReady;
-  $('totalMeta').innerHTML = `${esc(d.label)} &middot; ${esc(d.name)}<br>${nMain} steps${open ? ` + ${open} untimed hold${open > 1 ? 's' : ''}` : ''}<br>incl. ${nReady} \u00d7 ${GET_READY_SEC}s get-ready`;
+  const nReady = readyCount(steps), nMain = steps.length - nReady - nLog;
+  $('totalMeta').innerHTML = `${esc(d.label)} &middot; ${esc(d.name)}<br>${nMain} steps${open ? ` + ${open} untimed` : ''}${nLog ? ` + ${nLog} to log` : ''}<br>incl. ${nReady} \u00d7 ${GET_READY_SEC}s get-ready`;
   $('intro').innerHTML = (d.intro || []).map(t => `<div>${esc(t)}</div>`).join('');
+  const hist = d.assessment ? historyHtml(6) : '';
+  $('history').innerHTML = hist;
+  $('history').classList.toggle('hidden', !hist);
 
   let html = '', lastGrp = '', pendingReady = 0;
   steps.forEach(s => {
     if (s.kind === READY) { pendingReady = s.sec; return; }
     const g = s.section + (s.round && !s.betweenRounds ? ` \u00b7 ${s.roundWord} ${s.round} of ${s.rounds}` : '');
     if (!s.betweenRounds && g !== lastGrp) { html += `<li class="grp${s.veteran ? ' vet' : ''}">${esc(g)}</li>`; lastGrp = g; }
-    const note = [s.effortText, s.note].filter(Boolean).join(' \u2014 ');
+    const note = [s.effortText, s.note, s.kind === LOG ? '' : (s.ranges ? 'Ranges: ' + s.ranges : '')].filter(Boolean).join(' \u2014 ');
     const how = howFor(s);
     html += `<li class="st ${s.kind}${how ? ' has-how' : ''}"><span class="dot"></span><span class="n">${esc(s.name)}` +
       (how ? `<span class="chev">How \u25BE</span>` : '') +
       (note ? `<small>${esc(note)}</small>` : '') +
       (how ? `<div class="howbox">${howHtml(how)}</div>` : '') +
-      `</span><span class="s">${s.sec == null ? 'untimed' : fmt(s.sec)}${pendingReady ? `<span class="gr">+0:0${pendingReady} get ready</span>` : ''}</span></li>`;
+      `</span><span class="s">${s.kind === LOG ? 'enter' : s.sec == null ? 'untimed' : fmt(s.sec)}${pendingReady ? `<span class="gr">+0:0${pendingReady} get ready</span>` : ''}</span></li>`;
     pendingReady = 0;
   });
   $('stepList').innerHTML = html;
@@ -726,9 +1630,17 @@ $('days').addEventListener('click', e => {
 });
 $('levelSeg').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
-  UI.level = b.dataset.l; renderSetup();
+  UI.level = b.dataset.l; buildSetup();
 });
-$('weekSel').addEventListener('change', e => { UI.week = +e.target.value; UI.day = 0; buildSetup(); });
+$('weekSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (+b.dataset.w !== UI.week) { UI.week = +b.dataset.w; UI.day = 0; }
+  buildSetup();
+});
+$('modeSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  UI.mode = b.dataset.m; buildSetup();
+});
 $('vetSw').addEventListener('click', () => { UI.veteran = !UI.veteran; renderSetup(); });
 $('soundSw').addEventListener('click', () => { setMuted(!muted); renderSetup(); });
 
@@ -827,15 +1739,16 @@ function stepElapsed(t) { return T.stepAccum + (T.running ? t - T.stepStart : 0)
 function startWorkout() {
   initAudio();
   const d = curDay();
-  const hasVet = d.blocks.some(b => b.veteran);
   T.day = d;
-  T.steps = expandDay(d, { veteran: UI.veteran && hasVet, level: UI.level });
-  T.idx = 0; T.started = true; T.running = true; T.results = []; T.fired = {};
+  T.weekTitle = curWeek().title + (isRes() ? ' \u00b7 Resistance' : '');
+  T.weekNum = curWeek().week;
+  T.steps = expandDay(d, { veteran: UI.veteran && hasVeteran(d), level: UI.level });
+  T.idx = 0; T.started = true; T.running = true; T.rec = {}; T.fired = {};
   const t = now();
   T.stepStart = t; T.stepAccum = 0; T.activeMs = 0; T.activeStart = t; T.startedAt = t;
   const seen = {};
   T.steps.forEach(s => { const hw = howFor(s); if (hw && hw.anim) hw.anim.frames.forEach(f => { if (!seen[f]) { seen[f] = 1; const im = new Image(); im.src = f; } }); });
-  T.levelLabel = d.type === 'run' ? (LEVELS.find(l => l[0] === UI.level) || [])[1] : '';
+  T.levelLabel = d.levels ? (LEVELS.find(l => l[0] === UI.level) || [])[1] : '';
   show('timer');
   if (muted) unlockSpeech();
   onStepStart(null);                 // first announcement happens inside the tap = speech unlock
@@ -845,12 +1758,14 @@ function startWorkout() {
 
 function prevMain(i) { for (let j = i - 1; j >= 0; j--) if (T.steps[j].kind !== READY) return T.steps[j]; return null; }
 function nextMain(i) { for (let j = i + 1; j < T.steps.length; j++) if (T.steps[j].kind !== READY) return T.steps[j]; return null; }
+const tempoCue = (s, rep, j) => (s.tempo.reps > 1 && j === 0 ? `Rep ${rep}. ` : '') + s.tempo.phases[j][0];
 
 function onStepStart(remainingSec) {
   const s = curStep(); if (!s) return;
   const prev = T.steps[T.idx - 1], p = prevMain(T.idx);
   const roundStart = s.round && s.rounds > 1 && !s.betweenRounds && (!p || p.round !== s.round || p.section !== s.section);
   const roundTxt = roundStart ? `${s.roundWord} ${s.round} of ${s.rounds}` : '';
+  const openTxt = s.openSay || 'Hold as long as you can, then tap Done';
   const parts = [];
   let rate;
   if (remainingSec != null) {                                    // catching up after backgrounding
@@ -859,38 +1774,55 @@ function onStepStart(remainingSec) {
     if (s.veteran && (!p || !p.veteran)) parts.push('Veteran challenge');
     parts.push('Get ready for ' + spoken(s.target));
     rate = 1.12;
+  } else if (s.kind === LOG) {
+    parts.push('Enter ' + (s.say || s.name) + ', then tap Save');
   } else if (s.kind === WORK) {
     if (prev && prev.kind === READY) {
       parts.push('Go!');
       if (roundTxt) parts.push(roundTxt);
-      parts.push(s.sec == null ? 'Hold as long as you can, then tap Done' : speakDur(s.sec));
+      if (s.tempo) { parts.push(tempoCue(s, 1, 0)); T.fired.t1_0 = 1; }
+      else parts.push(s.sec == null ? openTxt : speakDur(s.sec));
     } else if (s.noReady) {
-      parts.push('Go!', roundTxt || spoken(s));                    // continuous run intervals
+      if (roundTxt) parts.push('Go!', roundTxt);                 // continuous run intervals
+      else parts.push(spoken(s).charAt(0).toUpperCase() + spoken(s).slice(1) + '!', speakDur(s.sec));         // e.g. "Sprint! 15 seconds" inside a run combo
     } else {
       if (roundTxt) parts.push(roundTxt);
-      parts.push(spoken(s), s.sec == null ? 'Hold as long as you can, then tap Done' : speakDur(s.sec));
+      parts.push(spoken(s), s.sec == null ? openTxt : speakDur(s.sec));
     }
   } else {
     if (s.betweenRounds) parts.push(`${s.roundWord} ${s.round} of ${s.rounds} done`);
+    else if (roundTxt) parts.push(roundTxt);
     parts.push(spoken(s), s.sec == null ? 'Tap Ready when you are ready' : speakDur(s.sec));
   }
   if (s.kind === WORK) beepSeq([[1320, 0.12, 0], [1320, 0.18, 160]]);
   else if (s.kind === READY) beep(740, 0.12);
+  else if (s.kind === LOG) beep(520, 0.2);
   else beep(660, 0.25);
   say(parts.reduce((a, x) => a ? a + (/[.!?]$/.test(a) ? ' ' : '. ') + x : x, ''), true, rate);
 }
 
 /* Cues: get-ready steps own the "3, 2, 1" before an exercise (then "Go!" at the start of the work).
    Rests that lead into a get-ready stay quiet at the end, so nothing doubles up.
-   Work steps count "3, 2, 1" into their rest. Continuous run/walk intervals count into each run. */
+   Work steps count "3, 2, 1" into their rest. Continuous run/walk intervals count into each run.
+   Tempo (time-under-tension) steps call every phase: "Rep 2. Up" ... "Hold" ... "Down". */
 function handleCues(t) {
   const s = curStep(), d = durMs(s); if (d == null) return;
-  const rem = d - stepElapsed(t);
+  const el = stepElapsed(t), rem = d - el;
   const cue = (key, atMs, fn) => {
     if (T.fired[key]) return;
     if (rem <= atMs) { T.fired[key] = 1; if (atMs - rem < 1200) fn(); }   // skip stale cues after backgrounding
   };
   if (s.cueAt) cue('mid', s.cueAt * 1000, () => { beep(990, 0.15); say(s.cue); });
+  if (s.tempo) {
+    let acc = 0;
+    for (let r = 1; r <= s.tempo.reps; r++) s.tempo.phases.forEach(([, sec], j) => {
+      const st = acc; acc += sec * 1000;
+      const key = 't' + r + '_' + j;
+      if (T.fired[key] || el < st) return;
+      T.fired[key] = 1;
+      if (el - st < 1200) { beep(j === 0 ? 990 : 760, 0.08, 0.25); say(tempoCue(s, r, j)); }
+    });
+  }
   const nx = T.steps[T.idx + 1];
   const countdown = d >= 4000 && !(s.kind === REST && nx && nx.kind === READY);
   if (countdown) [3, 2, 1].forEach(n => cue('c' + n, n * 1000, () => { beep(n === 1 ? 1046 : 880, 0.09, 0.3); say(String(n)); }));
@@ -938,15 +1870,25 @@ function resume() {
   requestWake();
   const s = curStep(), d = durMs(s);
   if (s.kind === READY) say('Get ready for ' + spoken(s.target));
-  else say('Go. ' + spoken(s) + (d != null ? ', ' + speakDur(Math.ceil((d - T.stepAccum) / 1000)) + ' left' : ''));
+  else if (s.kind !== LOG) say('Go. ' + spoken(s) + (d != null ? ', ' + speakDur(Math.ceil((d - T.stepAccum) / 1000)) + ' left' : ''));
   render(t);
+}
+/* Save what the step produced (a held/run time or a typed number) when moving forward. */
+function captureStep(s, idx, t) {
+  if (s.record) {
+    T.rec[idx] = { label: s.recordLabel || ((s.roundWord || 'Set') + ' ' + (s.round || 1)), key: s.recordKey || null,
+      unit: s.veteran ? 'sec' : 'time', value: Math.round(stepElapsed(t) / 1000), vet: !!s.veteran };
+  } else if (s.kind === LOG) {
+    const raw = String($('logIn').value || '').trim().replace(',', '.');
+    const v = raw === '' ? NaN : (s.unit === 'miles' ? Math.round(parseFloat(raw) * 100) / 100 : Math.round(parseFloat(raw)));
+    if (isFinite(v) && v >= 0) T.rec[idx] = { label: s.logLabel || s.name, key: s.logKey || null, unit: s.unit, value: v, ranges: s.ranges };
+    else delete T.rec[idx];
+  }
 }
 function goTo(i) {
   const t = now();
   const s = curStep();
-  if (s && s.record && i > T.idx) {
-    T.results.push({ name: s.name, label: (s.roundWord || 'Set') + ' ' + (s.round || 1), sec: Math.round(stepElapsed(t) / 1000) });
-  }
+  if (s && i > T.idx) captureStep(s, T.idx, t);
   if (i >= T.steps.length) {
     if (T.running) { T.activeMs += t - T.activeStart; T.activeStart = t; }
     finish(t, true); return;
@@ -961,23 +1903,51 @@ function finish(endTs, alreadyCounted) {
   releaseWake();
   const total = Math.round(T.activeMs / 1000);
   const wall = Math.round((now() - T.startedAt) / 1000);
-  $('doneName').textContent = `${curWeek().title} \u00b7 ${T.day.label} \u00b7 ${T.day.name}` + (T.levelLabel ? ` \u00b7 ${T.levelLabel}` : '');
+  $('doneName').textContent = `${T.weekTitle} \u00b7 ${T.day.label} \u00b7 ${T.day.name}` + (T.levelLabel ? ` \u00b7 ${T.levelLabel}` : '');
   $('doneTime').textContent = fmt(total);
   $('doneSub').textContent = 'Total workout time' + (wall - total > 5 ? ` \u00b7 ${fmt(wall)} including pauses` : '');
-  if (T.results.length) {
-    $('doneRes').innerHTML = '<b>Veteran Challenge holds</b><br>' +
-      T.results.map(r => `${esc(r.label)}: ${r.sec} s`).join('<br>') +
-      `<br><b>Total: ${T.results.reduce((a, r) => a + r.sec, 0)} s</b> &mdash; list it to your small team!`;
-    $('doneRes').classList.remove('hidden');
-  } else $('doneRes').classList.add('hidden');
+  const recs = Object.keys(T.rec).map(Number).sort((a, b) => a - b).map(k => T.rec[k]);
+  const vet = recs.filter(r => r.vet), other = recs.filter(r => !r.vet);
+  let html = '', saved = false;
+  if (vet.length) {
+    html += '<b>Veteran Challenge holds</b><br>' + vet.map(r => `${esc(r.label)}: ${r.value} s`).join('<br>') +
+      `<br><b>Total: ${vet.reduce((a, r) => a + r.value, 0)} s</b> &mdash; list it to your small team!`;
+  }
+  if (T.day.assessment) {
+    const entry = { date: new Date().toISOString(), test: T.day.assessment, week: T.weekNum };
+    other.forEach(r => { if (r.key) entry[r.key] = r.value; });
+    const prev = loadAssess().slice(-1)[0] || null;
+    saved = ASSESS_COLS.some(c => entry[c[0]] != null);
+    if (saved) saveAssess(entry);
+    html += (html ? '<br><br>' : '') + `<b>${esc(T.day.assessment)} results</b><div class="tblwrap"><table class="tbl"><tr><th>Test</th><th>You</th>` +
+      (prev ? `<th>Last (${esc(new Date(prev.date).toLocaleDateString())})</th>` : '') + '<th>Ranges</th></tr>' +
+      ASSESS_COLS.map(c => `<tr><td>${esc(c[1])}</td><td><b>${esc(fmtVal(entry[c[0]], c[2]))}</b></td>` +
+        (prev ? `<td>${esc(fmtVal(prev[c[0]], c[2]))}</td>` : '') + `<td class="rg">${esc(c[3])}</td></tr>`).join('') +
+      '</table></div>' + (saved ? '<small>Saved on this phone with today\u2019s date. Post your numbers to your triad.</small>'
+        : '<small>Nothing was entered, so nothing was saved.</small>');
+  } else if (other.length) {
+    html += (html ? '<br><br>' : '') + '<b>Your results</b><br>' +
+      other.map(r => `${esc(r.label)}: <b>${esc(fmtVal(r.value, r.unit))}${r.unit === 'reps' ? ' reps' : ''}</b>`).join('<br>') +
+      '<br><small>Post it to your triad / small team!</small>';
+  }
+  $('doneRes').innerHTML = html;
+  $('doneRes').classList.toggle('hidden', !html);
   show('done');
   beepSeq([[784, 0.15, 0], [988, 0.15, 180], [1318, 0.35, 360]]);
-  say('Workout complete. Great work, Warrior. Total time ' + speakDur(total) + '.');
+  say('Workout complete. Great work, Warrior. Total time ' + speakDur(total) + '.' + (saved ? ' Your results are saved.' : ''));
 }
 
 /* ===================== render ===================== */
 let lastBodyKind = '', lastHowIdx = -1;
 function setText(el, v) { if (el.textContent !== v) el.textContent = v; }
+function tempoState(s, el) {
+  let acc = 0;
+  for (let r = 1; r <= s.tempo.reps; r++) for (let j = 0; j < s.tempo.phases.length; j++) {
+    acc += s.tempo.phases[j][1] * 1000;
+    if (el < acc) return (s.tempo.reps > 1 ? `Rep ${r} of ${s.tempo.reps} \u00b7 ` : '') + s.tempo.phases[j][0];
+  }
+  return 'Last reps done \u2014 hold on';
+}
 function render(t) {
   if (!T.started) return;
   t = t || now();
@@ -986,6 +1956,7 @@ function render(t) {
   if (lastBodyKind !== s.kind) {
     document.body.classList.toggle('rest', s.kind === REST);
     document.body.classList.toggle('ready', s.kind === READY);
+    document.body.classList.toggle('log', s.kind === LOG);
     lastBodyKind = s.kind;
   }
   const show_ = s.kind === READY ? s.target : s;            // what the stage describes
@@ -995,20 +1966,22 @@ function render(t) {
   if (s.section === 'Warm-Up') phase = 'Warm-Up';
   else if (s.section === 'Cooldown') phase = 'Cooldown';
   else if (s.section === 'Stretch') phase = 'Stretch';
-  else if (s.name === 'Walk' || /walk/i.test(s.name)) phase = 'Walk';
+  else if (s.kind === REST && (s.name === 'Walk' || /walk/i.test(s.name))) phase = 'Walk';
   if (s.kind === READY) phase = 'Get Ready';
+  if (s.kind === LOG) phase = 'Log result';
   if (s.veteran) phase = 'Veteran \u00b7 ' + phase;
   setText($('phase'), T.running ? phase : 'Paused');
   setText($('round'), s.round && s.rounds > 1 ? `${s.roundWord} ${s.round} of ${s.rounds}` : (s.section && s.section !== phase ? s.section : ''));
   setText($('exName'), show_.name);
   setText($('exNote'), show_.note || '');
-  $('exEff').classList.toggle('hidden', !show_.effortText);
-  setText($('exEff'), show_.effortText ? (T.levelLabel + ': ' + show_.effortText) : '');
+  const eff = show_.effortText ? (T.levelLabel + ': ' + show_.effortText) : (show_.ranges && show_.kind !== LOG ? 'Ranges: ' + show_.ranges : '');
+  $('exEff').classList.toggle('hidden', !eff);
+  setText($('exEff'), eff);
 
-  // how-to panel: the current exercise (or the one you're getting ready for); on rests, preview the next exercise
+  // per-step setup: how-to panel (current exercise, or the one you're getting ready for; rests preview the next) + log box
   if (lastHowIdx !== T.idx) {
     lastHowIdx = T.idx;
-    let how = howFor(show_), title = 'How to do it';
+    let how = s.kind === LOG ? null : howFor(show_), title = 'How to do it';
     if (!how && s.kind === REST) {
       const nm = nextMain(T.idx);
       if (nm && nm.kind === WORK && howFor(nm)) { how = howFor(nm); title = 'Up next \u2014 how to do ' + nm.name; }
@@ -1016,18 +1989,34 @@ function render(t) {
     $('how').innerHTML = howHtml(how, title);
     $('how').classList.toggle('hidden', !how);
     $('how').scrollTop = 0;
+    const isLog = s.kind === LOG;
+    $('logBox').classList.toggle('hidden', !isLog);
+    $('logRange').classList.toggle('hidden', !isLog);
+    $('count').classList.toggle('hidden', isLog);
+    $('sBarWrap').classList.toggle('hidden', isLog);
+    if (isLog) {
+      const r = T.rec[T.idx];
+      $('logIn').value = r ? r.value : '';
+      $('logIn').step = s.unit === 'miles' ? '0.01' : '1';
+      $('logIn').inputMode = s.unit === 'miles' ? 'decimal' : 'numeric';
+      $('logRange').textContent = s.ranges ? 'Ranges: ' + s.ranges : (s.unit === 'miles' ? 'Miles, e.g. 2.75' : 'Total reps');
+    }
   }
 
   let countTxt, lbl;
-  if (d == null) { countTxt = fmt(Math.floor(el / 1000)); lbl = s.kind === WORK ? 'Hold \u2014 tap Done' : 'Rest \u2014 tap Ready'; }
-  else { countTxt = fmt(Math.ceil((d - el) / 1000)); lbl = T.running ? (s.kind === READY ? 'Get ready' : '') : 'Paused \u2014 tap Resume'; }
+  if (s.kind === LOG) { countTxt = ''; lbl = s.unit === 'miles' ? 'Distance (miles)' : 'Reps'; }
+  else if (d == null) { countTxt = fmt(Math.floor(el / 1000)); lbl = s.openLbl || (s.kind === WORK ? 'Hold \u2014 tap Done' : 'Rest \u2014 tap Ready'); }
+  else {
+    countTxt = fmt(Math.ceil((d - el) / 1000));
+    lbl = !T.running ? 'Paused \u2014 tap Resume' : s.kind === READY ? 'Get ready' : s.tempo ? tempoState(s, el) : '';
+  }
   setText($('count'), countTxt);
   $('count').classList.toggle('long', countTxt.length > 5);
   setText($('clockLbl'), lbl);
   $('sBar').style.width = d == null ? '100%' : Math.min(100, (el / d) * 100).toFixed(2) + '%';
 
   const nx = s.kind === READY ? s.target : nextMain(T.idx);
-  const nxHtml = nx ? `<b>Next up</b>${esc(nx.name)}<span class="ns">${nx.sec == null ? 'untimed' : fmt(nx.sec)}</span>`
+  const nxHtml = nx ? `<b>Next up</b>${esc(nx.name)}<span class="ns">${nx.kind === LOG ? 'log' : nx.sec == null ? 'untimed' : fmt(nx.sec)}</span>`
                     : '<b>Next up</b>Finish!';
   if ($('nextup').innerHTML !== nxHtml) $('nextup').innerHTML = nxHtml;
 
@@ -1041,13 +2030,13 @@ function render(t) {
   $('ovBar').style.width = total ? Math.min(100, ((doneSec + curDone) / total) * 100).toFixed(2) + '%' : '0';
 
   setText($('btnPlay'), T.running ? 'Pause' : 'Resume');
-  const skipTxt = d == null ? (s.kind === WORK ? 'Done \u2713' : 'Ready \u23ED') : 'Skip \u23ED';
+  const skipTxt = s.kind === LOG ? 'Save \u2713' : d == null ? (s.kind === WORK ? 'Done \u2713' : 'Ready \u23ED') : 'Skip \u23ED';
   setText($('btnSkip'), skipTxt);
 }
 
 function show(which) {
   ['setup', 'timer', 'done'].forEach(id => $(id).classList.toggle('hidden', id !== which));
-  if (which !== 'timer') { document.body.classList.remove('rest', 'ready'); lastBodyKind = ''; }
+  if (which !== 'timer') { document.body.classList.remove('rest', 'ready', 'log'); lastBodyKind = ''; }
   lastHowIdx = -1;
   window.scrollTo(0, 0);
 }
@@ -1073,8 +2062,17 @@ $('btnEnd').addEventListener('click', () => {
 });
 $('btnAgain').addEventListener('click', () => { show('setup'); renderSetup(); });
 $('how').addEventListener('click', e => { if (e.target.closest('a') && T.running) pause(); });  // demo opens in a new tab; timer waits
+function bumpLog(dir) {
+  const s = curStep(); if (!s || s.kind !== LOG) return;
+  const stepV = s.unit === 'miles' ? 0.1 : 1;
+  const v = Math.max(0, (parseFloat(String($('logIn').value).replace(',', '.')) || 0) + dir * stepV);
+  $('logIn').value = s.unit === 'miles' ? String(Math.round(v * 100) / 100) : String(Math.round(v));
+}
+$('logMinus').addEventListener('click', () => bumpLog(-1));
+$('logPlus').addEventListener('click', () => bumpLog(1));
 document.addEventListener('keydown', e => {
   if (!T.started) return;
+  if (e.target && e.target.tagName === 'INPUT') { if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); goTo(T.idx + 1); } return; }
   if (e.code === 'Space') { e.preventDefault(); T.running ? pause() : resume(); }
   else if (e.code === 'ArrowRight') goTo(T.idx + 1);
   else if (e.code === 'ArrowLeft') $('btnBack').click();
